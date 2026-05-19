@@ -30,28 +30,52 @@ function Home() {
 function Hero() {
   return (
     <section className="relative overflow-hidden">
+      {/* Animated background blobs */}
+      <div aria-hidden className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-32 -left-32 w-[480px] h-[480px] rounded-full bg-blue-300/40 blur-3xl animate-blob" />
+        <div className="absolute top-40 -right-40 w-[520px] h-[520px] rounded-full bg-blue-500/30 blur-3xl animate-blob" style={{ animationDelay: "-4s" }} />
+        <div className="absolute bottom-0 left-1/3 w-[420px] h-[420px] rounded-full bg-blue-100 blur-3xl animate-blob" style={{ animationDelay: "-8s" }} />
+      </div>
+      <div className="absolute inset-0 grid-bg pointer-events-none" />
+
       <div className="max-w-7xl mx-auto px-6 pt-12 pb-32 relative">
         {/* Decorative map */}
-        <svg className="absolute right-0 top-10 w-[520px] h-[520px] opacity-[0.18] pointer-events-none hidden md:block" viewBox="0 0 400 400" fill="none">
+        <svg className="absolute right-0 top-10 w-[520px] h-[520px] opacity-[0.35] pointer-events-none hidden md:block" viewBox="0 0 400 400" fill="none">
           <motion.path
             d="M40 320 Q 120 180, 200 220 T 360 80"
             stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 6"
             initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 3, ease: "easeInOut" }}
-            className="text-ink"
+            className="text-primary"
           />
-          <motion.circle cx="40" cy="320" r="6" fill="currentColor" className="text-crimson-seal"
+          <motion.circle cx="40" cy="320" r="6" fill="currentColor" className="text-primary"
             initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2 }} />
-          <motion.circle cx="200" cy="220" r="5" fill="currentColor" className="text-amber-seal"
+          <motion.circle cx="200" cy="220" r="5" fill="currentColor" className="text-accent"
             initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1.5 }} />
           <motion.g initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 2.8 }}>
-            <circle cx="360" cy="80" r="12" fill="currentColor" className="text-ink" />
-            <text x="360" y="84" textAnchor="middle" fontSize="10" fill="var(--parchment)" fontFamily="serif">X</text>
+            <circle cx="360" cy="80" r="12" fill="currentColor" className="text-primary" />
+            <text x="360" y="84" textAnchor="middle" fontSize="10" fill="#fff" fontFamily="sans-serif">X</text>
           </motion.g>
-          <g className="text-ink/30" fontFamily="serif" fontSize="8" fill="currentColor">
-            <text x="60" y="350">START</text>
-            <text x="370" y="60">END</text>
-          </g>
         </svg>
+
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+          className="stamp text-primary mb-10 bg-white/70 backdrop-blur">
+          <Sparkles className="w-3 h-3" /> Made by local artists
+        </motion.div>
+
+        <h1 className="font-display text-[clamp(3rem,9vw,8.5rem)] leading-[0.92] tracking-[-0.04em] text-foreground max-w-5xl text-balance">
+          {["Explore", "the city.", "Solve clues.", "Keep the story."].map((line, i) => (
+            <motion.span
+              key={line}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.15 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+              className="block"
+            >
+              {i === 2 ? <span className="text-gradient animate-gradient bg-hero-gradient">{line}</span> : line}
+            </motion.span>
+          ))}
+        </h1>
+
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
           className="stamp text-ink/70 mb-10">
