@@ -77,24 +77,6 @@ function Hero() {
         </h1>
 
 
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-          className="stamp text-ink/70 mb-10">
-          <Sparkles className="w-3 h-3" /> Made by local artists
-        </motion.div>
-
-        <h1 className="font-display text-[clamp(3rem,9vw,8.5rem)] leading-[0.92] tracking-[-0.04em] text-ink max-w-5xl text-balance">
-          {["Explore", "the city.", "Solve clues.", "Keep the story."].map((line, i) => (
-            <motion.span
-              key={line}
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.15 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
-              className="block"
-            >
-              {i === 2 ? <em className="italic font-light text-accent">{line}</em> : line}
-            </motion.span>
-          ))}
-        </h1>
 
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.8 }}
