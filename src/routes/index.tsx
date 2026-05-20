@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "motion/react";
-import { ArrowRight, Play, MapPin, Compass, Sparkles, Quote } from "lucide-react";
+import { motion, useScroll, useTransform } from "motion/react";
+import { useRef } from "react";
+import { ArrowRight, Play, MapPin, Compass, Sparkles, Quote, Key, Footprints } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { Marquee } from "@/components/site/Marquee";
 
@@ -28,19 +29,33 @@ function Home() {
 }
 
 function Hero() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const yMap = useTransform(scrollYProgress, [0, 1], [0, 180]);
+  const yBlob = useTransform(scrollYProgress, [0, 1], [0, -120]);
+  const yTitle = useTransform(scrollYProgress, [0, 1], [0, 80]);
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+
   return (
-    <section className="relative overflow-hidden">
+    <section ref={ref} className="relative overflow-hidden bg-soft">
       {/* Animated background blobs */}
-      <div aria-hidden className="absolute inset-0 pointer-events-none">
+      <motion.div aria-hidden style={{ y: yBlob }} className="absolute inset-0 pointer-events-none">
         <div className="absolute -top-32 -left-32 w-[480px] h-[480px] rounded-full bg-blue-300/40 blur-3xl animate-blob" />
         <div className="absolute top-40 -right-40 w-[520px] h-[520px] rounded-full bg-blue-500/30 blur-3xl animate-blob" style={{ animationDelay: "-4s" }} />
         <div className="absolute bottom-0 left-1/3 w-[420px] h-[420px] rounded-full bg-blue-100 blur-3xl animate-blob" style={{ animationDelay: "-8s" }} />
-      </div>
+      </motion.div>
       <div className="absolute inset-0 grid-bg pointer-events-none" />
+
+      {/* Floating mystery glyphs */}
+      <motion.div aria-hidden style={{ y: yMap, opacity }} className="absolute inset-0 pointer-events-none">
+        <Key className="absolute top-[18%] right-[14%] w-6 h-6 text-primary/30 float-slow" />
+        <Footprints className="absolute bottom-[22%] left-[8%] w-7 h-7 text-primary/25 float-slow" style={{ animationDelay: "-3s" }} />
+        <Compass className="absolute top-[55%] right-[30%] w-5 h-5 text-accent/30 spin-slow" />
+      </motion.div>
 
       <div className="max-w-7xl mx-auto px-6 pt-12 pb-32 relative">
         {/* Decorative map */}
-        <svg className="absolute right-0 top-10 w-[520px] h-[520px] opacity-[0.35] pointer-events-none hidden md:block" viewBox="0 0 400 400" fill="none">
+        <motion.svg style={{ y: yMap }} className="absolute right-0 top-10 w-[520px] h-[520px] opacity-[0.4] pointer-events-none hidden md:block" viewBox="0 0 400 400" fill="none">
           <motion.path
             d="M40 320 Q 120 180, 200 220 T 360 80"
             stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 6"
@@ -55,14 +70,14 @@ function Hero() {
             <circle cx="360" cy="80" r="12" fill="currentColor" className="text-primary" />
             <text x="360" y="84" textAnchor="middle" fontSize="10" fill="#fff" fontFamily="sans-serif">X</text>
           </motion.g>
-        </svg>
+        </motion.svg>
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
           className="stamp text-primary mb-10 bg-white/70 backdrop-blur">
           <Sparkles className="w-3 h-3" /> Made by local artists
         </motion.div>
 
-        <h1 className="font-display text-[clamp(3rem,9vw,8.5rem)] leading-[0.92] tracking-[-0.04em] text-foreground max-w-5xl text-balance">
+        <motion.h1 style={{ y: yTitle }} className="font-display text-[clamp(3rem,9vw,8.5rem)] leading-[0.92] tracking-[-0.04em] text-foreground max-w-5xl text-balance">
           {["Explore", "the city.", "Solve clues.", "Keep the story."].map((line, i) => (
             <motion.span
               key={line}
@@ -71,12 +86,10 @@ function Hero() {
               transition={{ duration: 0.9, delay: 0.15 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
               className="block"
             >
-              {i === 2 ? <span className="text-gradient animate-gradient bg-hero-gradient">{line}</span> : line}
+              {i === 2 ? <span className="text-gradient animate-gradient">{line}</span> : line}
             </motion.span>
           ))}
-        </h1>
-
-
+        </motion.h1>
 
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.8 }}
@@ -86,7 +99,7 @@ function Hero() {
             A clean, self-guided city hunt with hidden stories, playful clues, and a keepsake at the end.
           </p>
           <div className="flex flex-wrap items-center gap-4">
-            <Link to="/hunts" className="btn-shine group inline-flex items-center gap-3 rounded-full bg-hero-gradient animate-gradient text-white px-7 py-4 text-sm font-medium shadow-paper hover:shadow-glow transition-all">
+            <Link to="/hunts" className="btn-shine group inline-flex items-center gap-3 rounded-full bg-primary text-white px-7 py-4 text-sm font-medium shadow-paper hover:shadow-glow transition-all">
               Start a hunt
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
@@ -110,7 +123,7 @@ function Hero() {
             { k: "07", v: "Cities mapped", icon: Compass },
             { k: "01", v: "Live hunt", icon: Sparkles },
             { k: "∞", v: "Stories hidden", icon: Quote },
-          ].map(({ k, v, icon: Icon }, i) => (
+          ].map(({ k, v, icon: Icon }) => (
             <motion.div
               key={v}
               whileHover={{ y: -4 }}
@@ -270,19 +283,31 @@ function ContactCTA() {
     <section className="py-32">
       <div className="max-w-7xl mx-auto px-6">
         <Reveal>
-          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-amber-seal via-accent to-crimson-seal text-parchment p-10 md:p-20 grain">
-            <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-parchment/10 blur-3xl" />
-            <p className="font-mono text-xs tracking-[0.3em] uppercase text-parchment/80">Contact — 04</p>
-            <h2 className="mt-6 font-display text-[clamp(2.5rem,6vw,6rem)] leading-[0.95] text-balance max-w-4xl">
-              Create something <em className="italic font-light">worth discovering.</em>
-            </h2>
-            <p className="mt-8 text-lg text-parchment/85 max-w-xl">
-              Want to partner, create, or launch a hunt? Bring your city, your artwork, or your venue into the experience. We're building premium clue hunts shaped by local people.
-            </p>
-            <Link to="/contact" className="mt-10 inline-flex items-center gap-3 rounded-full bg-ink text-parchment px-7 py-4 text-sm font-medium hover:bg-parchment hover:text-ink transition-colors">
-              Let's build something
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+          <div className="relative overflow-hidden rounded-[2rem] bg-[oklch(0.18_0.06_254)] text-white p-10 md:p-20">
+            {/* mesh + grid */}
+            <div className="absolute inset-0 opacity-60" style={{ backgroundImage: "radial-gradient(at 20% 20%, oklch(0.5 0.22 252 / 0.5), transparent 50%), radial-gradient(at 80% 80%, oklch(0.58 0.2 250 / 0.35), transparent 55%)" }} />
+            <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)", backgroundSize: "44px 44px" }} />
+            <motion.div aria-hidden
+              animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+              className="absolute -right-24 -top-24 w-[420px] h-[420px] rounded-full border border-white/10"
+            >
+              <div className="absolute inset-8 rounded-full border border-white/10" />
+              <div className="absolute inset-20 rounded-full border border-white/10" />
+            </motion.div>
+
+            <div className="relative">
+              <p className="font-mono text-xs tracking-[0.3em] uppercase text-white/60">Contact — 04</p>
+              <h2 className="mt-6 font-display text-[clamp(2.5rem,6vw,6rem)] leading-[0.95] text-balance max-w-4xl">
+                Create something <em className="italic font-light text-gradient animate-gradient">worth discovering.</em>
+              </h2>
+              <p className="mt-8 text-lg text-white/75 max-w-xl">
+                Want to partner, create, or launch a hunt? Bring your city, your artwork, or your venue into the experience. We're building premium clue hunts shaped by local people.
+              </p>
+              <Link to="/contact" className="btn-shine mt-10 inline-flex items-center gap-3 rounded-full bg-white text-[oklch(0.18_0.06_254)] px-7 py-4 text-sm font-medium hover:bg-blue-50 transition-colors">
+                Let's build something
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         </Reveal>
       </div>
