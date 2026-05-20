@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { ArrowRight, Play, MapPin, Compass, Sparkles, Quote, Key, Footprints } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { Marquee } from "@/components/site/Marquee";
+import { CompassRose } from "@/components/site/CompassRose";
 
 export const Route = createFileRoute("/")({
   head: () => ({
