@@ -11,6 +11,8 @@ import {
 import appCss from "../styles.css?url";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { CursorGlow } from "@/components/site/CursorGlow";
+import { ScrollProgress } from "@/components/site/ScrollProgress";
 
 function NotFoundComponent() {
   return (
@@ -84,6 +86,8 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
+      <ScrollProgress />
+      <CursorGlow />
       <Header />
       <main className="pt-28">
         <Outlet />
