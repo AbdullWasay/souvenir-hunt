@@ -4,15 +4,18 @@ import { useRef } from "react";
 interface Props {
   progress?: MotionValue<number>;
   className?: string;
+  /** When true, react to scroll immediately (no spring lag). */
+  immediate?: boolean;
 }
 
 /** Artistic cartographer's compass rose. Rotates with scroll. */
-export function CompassRose({ progress, className }: Props) {
+export function CompassRose({ progress, className, immediate }: Props) {
   const ref = useRef<SVGSVGElement>(null);
   const { scrollYProgress } = useScroll();
   const source = progress ?? scrollYProgress;
   const rotateRaw = useTransform(source, [0, 1], [0, 540]);
-  const rotate = useSpring(rotateRaw, { stiffness: 40, damping: 20, mass: 0.8 });
+  const rotateSpring = useSpring(rotateRaw, { stiffness: 120, damping: 22, mass: 0.4 });
+  const rotate = immediate ? rotateRaw : rotateSpring;
   const counter = useTransform(rotate, (r) => -r);
 
   // ticks: 72 around (every 5°), longer every 15°, longest at cardinals
