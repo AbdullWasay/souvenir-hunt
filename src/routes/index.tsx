@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { ArrowRight, Play, MapPin, Compass, Sparkles, Quote, Key, Footprints } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { Marquee } from "@/components/site/Marquee";
+import { CompassRose } from "@/components/site/CompassRose";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -54,23 +55,14 @@ function Hero() {
       </motion.div>
 
       <div className="max-w-7xl mx-auto px-6 pt-12 pb-32 relative">
-        {/* Decorative map */}
-        <motion.svg style={{ y: yMap }} className="absolute right-0 top-10 w-[520px] h-[520px] opacity-[0.4] pointer-events-none hidden md:block" viewBox="0 0 400 400" fill="none">
-          <motion.path
-            d="M40 320 Q 120 180, 200 220 T 360 80"
-            stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 6"
-            initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 3, ease: "easeInOut" }}
-            className="text-primary"
-          />
-          <motion.circle cx="40" cy="320" r="6" fill="currentColor" className="text-primary"
-            initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2 }} />
-          <motion.circle cx="200" cy="220" r="5" fill="currentColor" className="text-accent"
-            initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 1.5 }} />
-          <motion.g initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 2.8 }}>
-            <circle cx="360" cy="80" r="12" fill="currentColor" className="text-primary" />
-            <text x="360" y="84" textAnchor="middle" fontSize="10" fill="#fff" fontFamily="sans-serif">X</text>
-          </motion.g>
-        </motion.svg>
+        {/* Artistic cartographer's compass — rotates as you scroll */}
+        <motion.div style={{ y: yMap, opacity }} className="absolute right-[-60px] top-4 w-[640px] h-[640px] pointer-events-none hidden md:block text-primary">
+          <CompassRose progress={scrollYProgress} className="w-full h-full opacity-70" />
+        </motion.div>
+        {/* mobile compass — smaller, behind */}
+        <div className="md:hidden absolute -right-32 top-20 w-[460px] h-[460px] pointer-events-none text-primary opacity-40">
+          <CompassRose progress={scrollYProgress} className="w-full h-full" />
+        </div>
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
           className="stamp text-primary mb-10 bg-white/70 backdrop-blur">
@@ -93,17 +85,17 @@ function Hero() {
 
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.8 }}
-          className="mt-12 grid md:grid-cols-2 gap-10 max-w-3xl"
+          className="mt-12 max-w-3xl"
         >
           <p className="text-lg text-foreground/80 leading-relaxed max-w-md">
             A clean, self-guided city hunt with hidden stories, playful clues, and a keepsake at the end.
           </p>
-          <div className="flex flex-wrap items-center gap-4">
-            <Link to="/hunts" className="btn-shine group inline-flex items-center gap-3 rounded-full bg-primary text-white px-7 py-4 text-sm font-medium shadow-paper hover:shadow-glow transition-all">
+          <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-10">
+            <Link to="/hunts" className="btn-shine group inline-flex items-center gap-3 rounded-full bg-primary text-white px-7 py-4 text-sm font-medium shadow-paper hover:shadow-glow transition-all whitespace-nowrap">
               Start a hunt
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
-            <Link to="/your-hunt" className="group inline-flex items-center gap-3 text-foreground font-medium">
+            <Link to="/your-hunt" className="group inline-flex items-center gap-3 text-foreground font-medium whitespace-nowrap">
               <span className="relative grid place-items-center w-11 h-11 rounded-full border border-primary/40 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                 <span className="absolute inset-0 rounded-full pulse-ring" />
                 <Play className="w-3.5 h-3.5 ml-0.5 relative" fill="currentColor" />
