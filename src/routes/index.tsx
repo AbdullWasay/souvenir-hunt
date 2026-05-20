@@ -398,7 +398,7 @@ function ContactCTA() {
             </motion.div>
 
             <div className="relative">
-              <p className="font-mono text-xs tracking-[0.3em] uppercase text-white/60">Contact — 04</p>
+              <p className="font-mono text-xs tracking-[0.3em] uppercase text-white/60">Partner with us — 05</p>
               <h2 className="mt-6 font-display text-[clamp(2.5rem,6vw,6rem)] leading-[0.95] text-balance max-w-4xl">
                 Create something <em className="italic font-light text-gradient animate-gradient">worth discovering.</em>
               </h2>

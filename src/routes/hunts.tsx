@@ -42,14 +42,22 @@ function HuntsPage() {
               <ChevronDown className="w-4 h-4" />
             </button>
           </div>
-          <div className="flex flex-wrap gap-2 mt-5">
+          <div className="flex flex-wrap gap-3 mt-6">
             {[
-              { label: "4 countries", active: true },
-              { label: "7 cities" },
-              { label: "1 live hunt" },
+              { label: "Countries", value: "04", active: true },
+              { label: "Cities", value: "07" },
+              { label: "Live hunt", value: "01" },
             ].map((c) => (
-              <span key={c.label}
-                className={`stamp ${c.active ? "bg-ink text-parchment border-ink" : "text-foreground/70"}`}>
+              <span
+                key={c.label}
+                className={`inline-flex items-center gap-2.5 rounded-full px-4 py-2 text-xs font-medium border transition-colors ${
+                  c.active
+                    ? "bg-primary text-white border-primary shadow-glow"
+                    : "bg-white text-foreground/70 border-border hover:border-primary/40"
+                }`}
+              >
+                <span className={`font-mono text-[10px] tracking-widest ${c.active ? "text-white/70" : "text-muted-foreground"}`}>{c.value}</span>
+                <span className={`w-px h-3 ${c.active ? "bg-white/30" : "bg-border"}`} />
                 {c.label}
               </span>
             ))}
