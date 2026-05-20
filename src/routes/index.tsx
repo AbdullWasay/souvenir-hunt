@@ -208,15 +208,18 @@ function Artists() {
           </Reveal>
         </div>
 
-        <div className="space-y-px bg-parchment/10 rounded-3xl overflow-hidden border border-parchment/10">
+        <div className="rounded-3xl overflow-hidden border border-parchment/15 divide-y divide-parchment/10">
           {skills.map((s, i) => (
             <Reveal key={s.label} delay={i * 0.08}>
-              <div className="grid md:grid-cols-12 items-center bg-ink px-6 md:px-10 py-10 group hover:bg-ink/70 transition-colors">
-                <span className="md:col-span-1 font-mono text-xs text-amber-seal">0{i + 1}</span>
-                <h3 className="md:col-span-4 font-display text-3xl mt-2 md:mt-0">{s.label}</h3>
+              <SpotlightRow
+                color="oklch(0.62 0.22 250 / 0.35)"
+                className="grid md:grid-cols-12 items-center px-6 md:px-10 py-12 group cursor-default"
+              >
+                <span className="md:col-span-1 font-mono text-xs text-accent">0{i + 1}</span>
+                <h3 className="md:col-span-4 font-display text-3xl mt-2 md:mt-0 transition-transform duration-500 group-hover:translate-x-2">{s.label}</h3>
                 <p className="md:col-span-6 mt-3 md:mt-0 text-parchment/70">{s.body}</p>
                 <ArrowRight className="hidden md:block md:col-span-1 w-5 h-5 ml-auto opacity-30 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-              </div>
+              </SpotlightRow>
             </Reveal>
           ))}
         </div>
@@ -227,14 +230,18 @@ function Artists() {
 
 function Reviews() {
   const reviews = [
-    { quote: "It felt like exploring Split inside a mystery novel. Clean, easy, and actually memorable.", name: "Mia & Luka", role: "Weekend travelers" },
-    { quote: "Way better than a normal walking tour. The souvenir at the end made it feel earned.", name: "Sophie", role: "Solo traveler" },
-    { quote: "Simple on mobile, fun to solve, and polished enough to feel premium.", name: "Daniel + friends", role: "Group of 4" },
+    { quote: "It felt like exploring Split inside a mystery novel. Clean, easy, and actually memorable.", name: "Mia & Luka", role: "Weekend travelers", city: "Zagreb" },
+    { quote: "Way better than a normal walking tour. The souvenir at the end made it feel earned.", name: "Sophie", role: "Solo traveler", city: "Paris" },
+    { quote: "Simple on mobile, fun to solve, and polished enough to feel premium.", name: "Daniel + friends", role: "Group of 4", city: "London" },
+    { quote: "We spent three hours wandering with grins on our faces. Genuine discovery.", name: "Ana", role: "Local guide", city: "Split" },
   ];
+  const [i, setI] = useState(0);
+  const go = (dir: number) => setI((p) => (p + dir + reviews.length) % reviews.length);
+  const r = reviews[i];
   return (
-    <section className="py-32">
+    <section className="py-32 relative">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid md:grid-cols-12 gap-12 mb-20">
+        <div className="grid md:grid-cols-12 gap-12 mb-16">
           <Reveal className="md:col-span-4">
             <p className="font-mono text-xs tracking-[0.3em] uppercase text-accent">Reviews — 03</p>
           </Reveal>
@@ -245,22 +252,131 @@ function Reviews() {
           </Reveal>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {reviews.map((r, i) => (
-            <Reveal key={r.name} delay={i * 0.1}>
-              <article className="paper-card rounded-3xl p-8 h-full flex flex-col">
-                <Quote className="w-8 h-8 text-accent mb-6" strokeWidth={1} />
-                <p className="font-display text-xl leading-snug text-ink flex-1">"{r.quote}"</p>
-                <div className="mt-8 pt-6 border-t border-border">
-                  <p className="font-medium text-ink">{r.name}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{r.role}</p>
-                </div>
-              </article>
-            </Reveal>
-          ))}
+        <Reveal>
+          <div className="relative paper-card rounded-[2rem] p-8 md:p-16 overflow-hidden">
+            <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-blue-200/50 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-blue-100/60 blur-3xl pointer-events-none" />
+            <Quote className="w-14 h-14 text-accent/40 mb-8 relative" strokeWidth={1} />
+            <div className="relative min-h-[220px] md:min-h-[180px]">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, y: -20, filter: "blur(8px)" }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <p className="font-display text-2xl md:text-4xl leading-snug text-ink text-balance">
+                    "{r.quote}"
+                  </p>
+                  <div className="mt-10 flex flex-wrap items-end justify-between gap-6">
+                    <div>
+                      <div className="flex gap-1 text-accent mb-3">
+                        {Array.from({ length: 5 }).map((_, j) => (
+                          <Star key={j} className="w-4 h-4" fill="currentColor" />
+                        ))}
+                      </div>
+                      <p className="font-medium text-ink">{r.name}</p>
+                      <p className="text-sm text-muted-foreground">{r.role} · {r.city}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            <div className="mt-12 flex items-center justify-between relative">
+              <div className="flex gap-2">
+                {reviews.map((_, j) => (
+                  <button
+                    key={j}
+                    onClick={() => setI(j)}
+                    aria-label={`Review ${j + 1}`}
+                    className={`h-1.5 rounded-full transition-all ${j === i ? "w-10 bg-primary" : "w-4 bg-border hover:bg-primary/40"}`}
+                  />
+                ))}
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => go(-1)} aria-label="Previous" className="w-12 h-12 rounded-full border border-border hover:border-primary hover:text-primary text-ink grid place-items-center transition-colors">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button onClick={() => go(1)} aria-label="Next" className="w-12 h-12 rounded-full bg-primary text-white grid place-items-center hover:shadow-glow transition-shadow">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function ContactForm() {
+  const [sent, setSent] = useState(false);
+  return (
+    <section className="py-32 relative">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid md:grid-cols-12 gap-10 items-start">
+          <Reveal className="md:col-span-5">
+            <p className="font-mono text-xs tracking-[0.3em] uppercase text-accent">Get in touch — 04</p>
+            <h2 className="mt-6 font-display text-[clamp(2.25rem,4.5vw,4rem)] leading-[1] text-ink text-balance">
+              Bring a hunt to your <em className="italic font-light text-gradient animate-gradient">city.</em>
+            </h2>
+            <p className="mt-6 text-foreground/75 max-w-md">
+              Partner with us, or send a note. We reply within ~48 hours.
+            </p>
+            <div className="mt-10 flex items-center gap-3 text-sm">
+              <span className="w-10 h-px bg-primary/40" />
+              <span className="font-mono text-muted-foreground">hello@souvenirhunt.co</span>
+            </div>
+          </Reveal>
+
+          <Reveal className="md:col-span-7" delay={0.1}>
+            <form
+              onSubmit={(e) => { e.preventDefault(); setSent(true); }}
+              className="paper-card rounded-3xl p-8 md:p-10 space-y-5 relative overflow-hidden"
+            >
+              <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-blue-100/70 blur-3xl pointer-events-none" />
+              <div className="relative grid md:grid-cols-2 gap-5">
+                <HomeField label="Name" placeholder="Your name" />
+                <HomeField label="Email" type="email" placeholder="you@city.com" />
+              </div>
+              <div className="relative">
+                <HomeField label="City / Venue" placeholder="Where should we bring a hunt?" />
+              </div>
+              <label className="block relative">
+                <span className="text-xs font-mono tracking-widest uppercase text-muted-foreground">Message</span>
+                <textarea
+                  rows={4}
+                  placeholder="Tell us about your idea…"
+                  className="mt-2 w-full rounded-2xl bg-muted/60 border border-border px-5 py-4 text-ink outline-none focus:border-primary transition-colors resize-none"
+                />
+              </label>
+              <button
+                type="submit"
+                className="btn-shine relative group inline-flex items-center gap-3 rounded-full bg-primary text-white px-7 py-4 text-sm font-medium hover:shadow-glow transition-shadow"
+              >
+                {sent ? "Sent — we'll be in touch" : "Send message"}
+                <Send className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </button>
+            </form>
+          </Reveal>
         </div>
       </div>
     </section>
+  );
+}
+
+function HomeField({ label, type = "text", placeholder }: { label: string; type?: string; placeholder?: string }) {
+  return (
+    <label className="block">
+      <span className="text-xs font-mono tracking-widest uppercase text-muted-foreground">{label}</span>
+      <input
+        type={type}
+        placeholder={placeholder}
+        className="mt-2 w-full rounded-2xl bg-muted/60 border border-border px-5 py-4 text-ink outline-none focus:border-primary transition-colors"
+      />
+    </label>
   );
 }
 
