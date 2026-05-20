@@ -13,6 +13,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CursorGlow } from "@/components/site/CursorGlow";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
+import { StickyCompass } from "@/components/site/StickyCompass";
 
 function NotFoundComponent() {
   return (
@@ -88,8 +89,9 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ScrollProgress />
       <CursorGlow />
+      <StickyCompass />
       <Header />
-      <main className="pt-28">
+      <main className="pt-28 relative z-10">
         <Outlet />
       </main>
       <Footer />
