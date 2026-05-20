@@ -85,17 +85,17 @@ function Hero() {
 
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.8 }}
-          className="mt-12 grid md:grid-cols-2 gap-10 max-w-3xl"
+          className="mt-12 max-w-3xl"
         >
           <p className="text-lg text-foreground/80 leading-relaxed max-w-md">
             A clean, self-guided city hunt with hidden stories, playful clues, and a keepsake at the end.
           </p>
-          <div className="flex flex-wrap items-center gap-4">
-            <Link to="/hunts" className="btn-shine group inline-flex items-center gap-3 rounded-full bg-primary text-white px-7 py-4 text-sm font-medium shadow-paper hover:shadow-glow transition-all">
+          <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-10">
+            <Link to="/hunts" className="btn-shine group inline-flex items-center gap-3 rounded-full bg-primary text-white px-7 py-4 text-sm font-medium shadow-paper hover:shadow-glow transition-all whitespace-nowrap">
               Start a hunt
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
-            <Link to="/your-hunt" className="group inline-flex items-center gap-3 text-foreground font-medium">
+            <Link to="/your-hunt" className="group inline-flex items-center gap-3 text-foreground font-medium whitespace-nowrap">
               <span className="relative grid place-items-center w-11 h-11 rounded-full border border-primary/40 text-primary group-hover:bg-primary group-hover:text-white transition-colors">
                 <span className="absolute inset-0 rounded-full pulse-ring" />
                 <Play className="w-3.5 h-3.5 ml-0.5 relative" fill="currentColor" />
