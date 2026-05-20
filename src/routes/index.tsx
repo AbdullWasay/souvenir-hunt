@@ -1,10 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
-import { ArrowRight, Play, MapPin, Compass, Sparkles, Quote, Key, Footprints } from "lucide-react";
+import { motion, useScroll, useTransform, AnimatePresence } from "motion/react";
+import { useRef, useState } from "react";
+import { ArrowRight, Play, MapPin, Compass, Sparkles, Quote, Key, Footprints, ChevronLeft, ChevronRight, Star, Send } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { Marquee } from "@/components/site/Marquee";
-import { CompassRose } from "@/components/site/CompassRose";
+import { SpotlightRow } from "@/components/site/SpotlightRow";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -24,6 +24,7 @@ function Home() {
       <About />
       <Artists />
       <Reviews />
+      <ContactForm />
       <ContactCTA />
     </>
   );
@@ -55,14 +56,7 @@ function Hero() {
       </motion.div>
 
       <div className="max-w-7xl mx-auto px-6 pt-12 pb-32 relative">
-        {/* Artistic cartographer's compass — rotates as you scroll */}
-        <motion.div style={{ y: yMap, opacity }} className="absolute right-[-60px] top-4 w-[640px] h-[640px] pointer-events-none hidden md:block text-primary">
-          <CompassRose progress={scrollYProgress} className="w-full h-full opacity-70" />
-        </motion.div>
-        {/* mobile compass — smaller, behind */}
-        <div className="md:hidden absolute -right-32 top-20 w-[460px] h-[460px] pointer-events-none text-primary opacity-40">
-          <CompassRose progress={scrollYProgress} className="w-full h-full" />
-        </div>
+
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
           className="stamp text-primary mb-10 bg-white/70 backdrop-blur">
