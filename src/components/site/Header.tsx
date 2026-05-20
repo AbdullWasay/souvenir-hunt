@@ -25,7 +25,7 @@ export function Header() {
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "py-3" : "py-6"}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className={`flex items-center justify-between gap-4 rounded-full border border-border/70 bg-card/80 backdrop-blur-xl px-4 sm:px-6 py-3 transition-all duration-500 ${scrolled ? "shadow-paper" : ""}`}>
+        <div className={`flex items-center justify-between gap-4 rounded-full px-4 sm:px-6 py-3 transition-all duration-500 ${scrolled ? "border border-border/70 bg-white/70 backdrop-blur-xl shadow-paper" : "border border-transparent bg-transparent"}`}>
           <Link to="/" className="flex items-center gap-2.5 group">
             <span className="relative grid place-items-center w-9 h-9 rounded-full bg-ink text-parchment overflow-hidden">
               <Compass className="w-4.5 h-4.5 transition-transform duration-700 group-hover:rotate-180" strokeWidth={1.5} />
