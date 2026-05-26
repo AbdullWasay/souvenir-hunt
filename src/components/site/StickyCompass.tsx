@@ -11,14 +11,17 @@ type Variant = {
   opacity: [number, number, number, number];
 };
 
+// For side:"right" with right:0, NEGATIVE x pulls the compass into view.
+// For side:"left" with left:0, POSITIVE x pulls it into view.
 const variants: Record<string, Variant> = {
-  "/":         { x: ["8vw",  "-20vw", "12vw"],  y: ["0vh",  "8vh",  "-4vh"], side: "right", size: "70vh", top: "14vh", opacity: [0.32, 0.4, 0.35, 0.18] },
-  "/hunts":    { x: ["-15vw","18vw", "-10vw"], y: ["4vh",  "-6vh", "10vh"], side: "left",  size: "60vh", top: "18vh", opacity: [0.28, 0.38, 0.32, 0.15] },
-  "/your-hunt":{ x: ["20vw", "-15vw","25vw"],  y: ["-5vh", "12vh", "0vh"],  side: "right", size: "65vh", top: "20vh", opacity: [0.25, 0.35, 0.3, 0.15] },
-  "/about":    { x: ["-10vw","15vw", "-20vw"], y: ["10vh", "-5vh", "8vh"],  side: "left",  size: "75vh", top: "10vh", opacity: [0.3, 0.4, 0.3, 0.15] },
-  "/artists":  { x: ["15vw", "-25vw","10vw"],  y: ["0vh",  "15vh", "-8vh"], side: "right", size: "55vh", top: "22vh", opacity: [0.28, 0.36, 0.34, 0.16] },
-  "/reviews":  { x: ["-20vw","10vw", "-15vw"], y: ["6vh",  "-10vh","4vh"],  side: "left",  size: "65vh", top: "16vh", opacity: [0.26, 0.38, 0.3, 0.14] },
-  "/contact":  { x: ["12vw", "-18vw","20vw"],  y: ["-8vh", "10vh", "-2vh"], side: "right", size: "70vh", top: "12vh", opacity: [0.3, 0.4, 0.32, 0.16] },
+  "/":         { x: ["-18vw", "-32vw", "-8vw"], y: ["2vh",  "10vh", "-4vh"], side: "right", size: "70vh", top: "14vh", opacity: [0.38, 0.45, 0.4, 0.22] },
+  "/hunts":    { x: ["10vw",  "28vw",  "6vw"],  y: ["4vh",  "-6vh", "10vh"], side: "left",  size: "60vh", top: "18vh", opacity: [0.32, 0.42, 0.36, 0.18] },
+  "/your-hunt":{ x: ["-12vw", "-30vw", "-6vw"], y: ["-5vh", "12vh", "0vh"],  side: "right", size: "65vh", top: "20vh", opacity: [0.3, 0.4, 0.34, 0.18] },
+  "/about":    { x: ["8vw",   "26vw",  "4vw"],  y: ["10vh", "-5vh", "8vh"],  side: "left",  size: "75vh", top: "10vh", opacity: [0.34, 0.44, 0.34, 0.18] },
+  "/artists":  { x: ["-14vw", "-28vw", "-10vw"],y: ["0vh",  "15vh", "-8vh"], side: "right", size: "55vh", top: "22vh", opacity: [0.32, 0.4, 0.38, 0.2] },
+  "/reviews":  { x: ["12vw",  "30vw",  "6vw"],  y: ["6vh",  "-10vh","4vh"],  side: "left",  size: "65vh", top: "16vh", opacity: [0.3, 0.42, 0.34, 0.18] },
+  "/contact":  { x: ["-10vw", "-26vw", "-16vw"],y: ["-8vh", "10vh", "-2vh"], side: "right", size: "70vh", top: "12vh", opacity: [0.34, 0.44, 0.36, 0.2] },
+  "/admin":    { x: ["-8vw",  "-20vw", "-4vw"], y: ["0vh",  "6vh",  "-2vh"], side: "right", size: "50vh", top: "20vh", opacity: [0.18, 0.22, 0.2, 0.1] },
 };
 
 export function StickyCompass() {
