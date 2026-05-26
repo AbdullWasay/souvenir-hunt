@@ -175,32 +175,80 @@ function About() {
 }
 
 function Artists() {
-  const skills = [
-    { label: "Storytelling", body: "Narratives that feel rooted in place rather than copied from a template." },
-    { label: "Puzzle design", body: "Clues paced to feel polished, intuitive, and satisfying to solve." },
-    { label: "Souvenir craft", body: "A physical ending that feels local, memorable, and earned." },
+  const crafts = [
+    {
+      label: "Storytelling",
+      body: "Narratives that feel rooted in place rather than copied from a template.",
+      meta: "Writers · Historians · Locals",
+      glyph: (
+        <svg viewBox="0 0 64 64" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.2">
+          <path d="M10 14 L32 8 L54 14 L54 54 L32 48 L10 54 Z" />
+          <path d="M32 8 L32 48" />
+          <path d="M16 22 L26 24 M16 30 L26 32 M16 38 L26 40" strokeLinecap="round" />
+          <path d="M38 22 L48 20 M38 30 L48 28 M38 38 L48 36" strokeLinecap="round" />
+        </svg>
+      ),
+    },
+    {
+      label: "Puzzle design",
+      body: "Clues paced to feel polished, intuitive, and satisfying to solve.",
+      meta: "Game designers · Cryptics · Testers",
+      glyph: (
+        <svg viewBox="0 0 64 64" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.2">
+          <path d="M8 12 H28 V24 a6 6 0 0 0 12 0 V12 H56 V32 a6 6 0 0 1 0 12 V56 H40 V44 a6 6 0 0 1 -12 0 V56 H8 a6 6 0 0 1 0 -12 V32 a6 6 0 0 0 0 -20 Z" />
+          <circle cx="32" cy="32" r="2.5" fill="currentColor" />
+        </svg>
+      ),
+    },
+    {
+      label: "Souvenir craft",
+      body: "A physical ending that feels local, memorable, and earned.",
+      meta: "Makers · Printers · Ceramicists",
+      glyph: (
+        <svg viewBox="0 0 64 64" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.2">
+          <circle cx="32" cy="28" r="18" />
+          <circle cx="32" cy="28" r="11" />
+          <path d="M32 10 L32 4 M14 28 L8 28 M50 28 L56 28 M32 46 L32 52" strokeLinecap="round" />
+          <path d="M24 50 L20 60 L32 56 L44 60 L40 50" />
+        </svg>
+      ),
+    },
   ];
+
+  const [active, setActive] = useState(0);
+
   return (
     <section className="py-32 bg-ink text-parchment relative overflow-hidden">
-      <div className="absolute inset-0 opacity-[0.06]">
-        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <defs>
-            <pattern id="grid" width="8" height="8" patternUnits="userSpaceOnUse">
-              <path d="M 8 0 L 0 0 0 8" fill="none" stroke="currentColor" strokeWidth="0.2" />
-            </pattern>
-          </defs>
-          <rect width="100" height="100" fill="url(#grid)" />
+      <div aria-hidden className="absolute inset-0 opacity-[0.08] pointer-events-none">
+        <svg className="w-full h-full" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+          {Array.from({ length: 14 }).map((_, i) => (
+            <path
+              key={i}
+              d={`M0 ${80 + i * 38} Q200 ${40 + i * 38} 400 ${100 + i * 38} T800 ${70 + i * 38}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="0.6"
+            />
+          ))}
         </svg>
       </div>
+      <motion.div
+        aria-hidden
+        className="absolute -top-32 -left-32 w-[40rem] h-[40rem] rounded-full blur-3xl pointer-events-none"
+        style={{ background: "radial-gradient(circle, oklch(0.58 0.2 250 / 0.35), transparent 70%)" }}
+        animate={{ x: [0, 60, 0], y: [0, 40, 0] }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+      />
 
       <div className="max-w-7xl mx-auto px-6 relative">
         <div className="grid md:grid-cols-12 gap-12 mb-20">
           <Reveal className="md:col-span-4">
-            <p className="font-mono text-xs tracking-[0.3em] uppercase text-amber-seal">Artists &amp; Makers — 02</p>
+            <p className="font-mono text-xs tracking-[0.3em] uppercase text-blue-300">Artists &amp; Makers — 02</p>
           </Reveal>
           <Reveal className="md:col-span-8" delay={0.1}>
             <h2 className="font-display text-[clamp(2.5rem,5vw,5rem)] leading-[1] text-balance">
-              Built with local artists, storytellers, and <em className="italic font-light text-amber-seal">game makers.</em>
+              Built with local artists, storytellers, and{" "}
+              <em className="italic font-light text-gradient animate-gradient">game makers.</em>
             </h2>
             <p className="mt-8 text-lg text-parchment/70 max-w-2xl">
               Each hunt is shaped by people who know how to turn a city into something cultural, playful, and worth remembering.
@@ -208,20 +256,123 @@ function Artists() {
           </Reveal>
         </div>
 
-        <div className="rounded-3xl overflow-hidden border border-parchment/15 divide-y divide-parchment/10">
-          {skills.map((s, i) => (
-            <Reveal key={s.label} delay={i * 0.08}>
-              <SpotlightRow
-                color="oklch(0.62 0.22 250 / 0.35)"
-                className="grid md:grid-cols-12 items-center px-6 md:px-10 py-12 group cursor-default"
-              >
-                <span className="md:col-span-1 font-mono text-xs text-accent">0{i + 1}</span>
-                <h3 className="md:col-span-4 font-display text-3xl mt-2 md:mt-0 transition-transform duration-500 group-hover:translate-x-2">{s.label}</h3>
-                <p className="md:col-span-6 mt-3 md:mt-0 text-parchment/70">{s.body}</p>
-                <ArrowRight className="hidden md:block md:col-span-1 w-5 h-5 ml-auto opacity-30 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-              </SpotlightRow>
-            </Reveal>
-          ))}
+        <div className="grid lg:grid-cols-12 gap-8 items-start">
+          <div className="lg:col-span-7 space-y-3">
+            {crafts.map((c, i) => {
+              const isActive = active === i;
+              return (
+                <motion.button
+                  key={c.label}
+                  onMouseEnter={() => setActive(i)}
+                  onFocus={() => setActive(i)}
+                  onClick={() => setActive(i)}
+                  className={`relative w-full text-left rounded-2xl border overflow-hidden transition-colors duration-500 ${
+                    isActive
+                      ? "border-blue-300/50 bg-gradient-to-r from-blue-500/15 via-blue-700/10 to-transparent"
+                      : "border-parchment/10 bg-parchment/[0.02] hover:border-parchment/25"
+                  }`}
+                  initial={false}
+                  animate={{ paddingTop: isActive ? 28 : 20, paddingBottom: isActive ? 28 : 20 }}
+                >
+                  <motion.span
+                    aria-hidden
+                    className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-blue-300 to-blue-600"
+                    initial={false}
+                    animate={{ scaleY: isActive ? 1 : 0.15, opacity: isActive ? 1 : 0.4 }}
+                    style={{ transformOrigin: "top" }}
+                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  />
+                  <div className="grid grid-cols-[auto_1fr_auto] items-center gap-6 px-6 md:px-10">
+                    <span className={`font-mono text-xs tracking-widest ${isActive ? "text-blue-300" : "text-parchment/40"}`}>
+                      / 0{i + 1}
+                    </span>
+                    <div>
+                      <h3 className="font-display text-2xl md:text-3xl">{c.label}</h3>
+                      <AnimatePresence initial={false}>
+                        {isActive && (
+                          <motion.div
+                            key="exp"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                            className="overflow-hidden"
+                          >
+                            <p className="mt-3 text-parchment/75 max-w-xl">{c.body}</p>
+                            <p className="mt-3 font-mono text-[11px] tracking-[0.2em] uppercase text-parchment/40">{c.meta}</p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                    <motion.div
+                      animate={{ rotate: isActive ? 45 : 0, scale: isActive ? 1.1 : 1 }}
+                      transition={{ duration: 0.4 }}
+                      className={`w-10 h-10 rounded-full grid place-items-center border ${isActive ? "border-blue-300 text-blue-300" : "border-parchment/20 text-parchment/40"}`}
+                    >
+                      <ArrowRight className="w-4 h-4" />
+                    </motion.div>
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
+
+          <div className="lg:col-span-5 lg:sticky lg:top-32">
+            <div className="relative aspect-[4/5] rounded-3xl border border-parchment/15 overflow-hidden bg-gradient-to-br from-blue-900/40 via-ink to-ink">
+              <div
+                className="absolute inset-0 opacity-30"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(oklch(0.78 0.12 245 / 0.15) 1px, transparent 1px), linear-gradient(90deg, oklch(0.78 0.12 245 / 0.15) 1px, transparent 1px)",
+                  backgroundSize: "32px 32px",
+                }}
+              />
+              <motion.div
+                aria-hidden
+                className="absolute inset-8 rounded-full border border-dashed border-blue-300/30"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+              />
+              <motion.div
+                aria-hidden
+                className="absolute inset-20 rounded-full border border-blue-300/20"
+                animate={{ rotate: -360 }}
+                transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+              />
+
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={active}
+                  initial={{ opacity: 0, scale: 0.9, rotate: -8 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 1.05, rotate: 6 }}
+                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute inset-0 grid place-items-center text-blue-300"
+                >
+                  <div className="w-1/2 h-1/2">{crafts[active].glyph}</div>
+                </motion.div>
+              </AnimatePresence>
+
+              <div className="absolute bottom-0 inset-x-0 p-6 flex items-end justify-between border-t border-parchment/10 bg-ink/40 backdrop-blur-sm">
+                <div>
+                  <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-parchment/40">Now showing</p>
+                  <AnimatePresence mode="wait">
+                    <motion.p
+                      key={active}
+                      initial={{ y: 10, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: -10, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="font-display text-xl mt-1"
+                    >
+                      {crafts[active].label}
+                    </motion.p>
+                  </AnimatePresence>
+                </div>
+                <span className="font-mono text-xs text-blue-300">0{active + 1} / 0{crafts.length}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
