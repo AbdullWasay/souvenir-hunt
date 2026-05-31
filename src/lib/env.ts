@@ -20,6 +20,20 @@ function optional(name: string): string | undefined {
   return cleanEnvValue(process.env[name]);
 }
 
+function resolveAppUrl(): string {
+  const explicit = optional("APP_URL");
+  if (explicit) return explicit.replace(/\/$/, "");
+
+  // Vercel sets these automatically — use when APP_URL wasn't configured.
+  const vercelProduction = optional("VERCEL_PROJECT_PRODUCTION_URL");
+  if (vercelProduction) return `https://${vercelProduction.replace(/^https?:\/\//, "").replace(/\/$/, "")}`;
+
+  const vercelUrl = optional("VERCEL_URL");
+  if (vercelUrl) return `https://${vercelUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}`;
+
+  return "http://localhost:5173";
+}
+
 export const env = {
   get mongoUri() {
     return required("MONGODB_URI");
@@ -40,7 +54,7 @@ export const env = {
     return optional("STRIPE_WEBHOOK_SECRET");
   },
   get appUrl() {
-    return optional("APP_URL") ?? "http://localhost:5173";
+    return resolveAppUrl();
   },
   get resendApiKey() {
     return optional("RESEND_API_KEY");

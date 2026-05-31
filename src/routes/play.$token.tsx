@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -20,11 +20,15 @@ export const Route = createFileRoute("/play/$token")({
   component: PlayPage,
 });
 
-function initialPhase(progress: {
-  currentStepIndex: number;
-  completedStepIds: string[];
-  introCompleted?: boolean;
-}): "before" | "guidelines" | "playing" {
+function initialPhase(
+  progress: {
+    currentStepIndex: number;
+    completedStepIds: string[];
+    introCompleted?: boolean;
+  },
+  stepCount: number,
+): "before" | "guidelines" | "playing" {
+  if (stepCount > 0 && progress.currentStepIndex >= stepCount) return "playing";
   if (
     progress.introCompleted ||
     progress.currentStepIndex > 0 ||
@@ -118,8 +122,8 @@ function PlayPage() {
   const data = Route.useLoaderData();
   if (!data) throw notFound();
 
-  const navigate = useNavigate();
   const { hunt, progress, order } = data;
+  const steps = hunt.steps ?? [];
   const [stepIndex, setStepIndex] = useState(progress.currentStepIndex);
   const [viewIndex, setViewIndex] = useState(progress.currentStepIndex);
   const [completed, setCompleted] = useState<string[]>(progress.completedStepIds);
@@ -127,11 +131,12 @@ function PlayPage() {
   const [answer, setAnswer] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [closed, setClosed] = useState(Boolean(progress.closedAt));
-  const [phase, setPhase] = useState<"before" | "guidelines" | "playing">(() => initialPhase(progress));
+  const [phase, setPhase] = useState<"before" | "guidelines" | "playing">(() =>
+    initialPhase(progress, steps.length),
+  );
   const [revealedHints, setRevealedHints] = useState(progress.revealedHints ?? 0);
   const [saving, setSaving] = useState(false);
 
-  const steps = hunt.steps ?? [];
   const step = steps[viewIndex];
   const activeStep = steps[stepIndex];
   const finished = stepIndex >= steps.length;
@@ -168,10 +173,12 @@ function PlayPage() {
   }, [finished, closed, order.accessToken]);
 
   useEffect(() => {
-    if (finished || closed) {
-      navigate({ hash: "complete", replace: true });
+    if (!finished && !closed) return;
+    const url = `${window.location.pathname}${window.location.search}#complete`;
+    if (window.location.hash !== "#complete") {
+      window.history.replaceState(null, "", url);
     }
-  }, [finished, closed, navigate]);
+  }, [finished, closed]);
 
   function goToStep(index: number) {
     if (index < 0 || index > stepIndex || index >= steps.length) return;
@@ -220,7 +227,7 @@ function PlayPage() {
     void persist(stepIndex, completed, { introCompleted: true, revealedHints: revealedHints });
   }
 
-  function submitAnswer(e: React.FormEvent) {
+  async function submitAnswer(e: React.FormEvent) {
     e.preventDefault();
     if (!activeStep || !isCurrentStep) return;
     if (stepAcceptsAnswer(activeStep, answer)) {
@@ -230,10 +237,11 @@ function PlayPage() {
       setStepIndex(nextIndex);
       setViewIndex(nextIndex);
       setAnswer("");
-      setMessage("Correct. Next clue unlocked.");
+      setMessage(nextIndex >= steps.length ? "Hunt complete!" : "Correct. Next clue unlocked.");
       setRevealedHints(0);
       setActiveTab("story");
-      void persist(nextIndex, nextCompleted, { introCompleted: true, revealedHints: 0 });
+      setPhase("playing");
+      await persist(nextIndex, nextCompleted, { introCompleted: true, revealedHints: 0 });
     } else {
       setMessage("Not quite — try again or tap Get hint.");
     }
@@ -250,6 +258,89 @@ function PlayPage() {
 
   const shellClass =
     "w-full max-w-xl md:max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-28";
+
+  if (finished || steps.length === 0) {
+    const qrUrl = staffCloseUrl
+      ? `https://quickchart.io/qr?size=280&text=${encodeURIComponent(staffCloseUrl)}`
+      : null;
+
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-10 sm:py-16 pb-28">
+        <div className="flex flex-col items-center gap-3 mb-6 sm:mb-8">
+          <div className="flex items-center gap-3">
+            <img
+              src="/assets/branding/logo-main.svg"
+              alt=""
+              aria-hidden
+              className="h-10 sm:h-12 w-auto shrink-0 object-contain [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(98%)_saturate(4688%)_hue-rotate(221deg)_brightness(101%)_contrast(103%)]"
+            />
+            <span className="font-display font-bold text-[1.35rem] sm:text-[1.65rem] leading-none text-primary tracking-tight">
+              Souvenir Hunt
+            </span>
+          </div>
+        </div>
+
+        <div className="w-full max-w-md">
+          <Reveal>
+            <div className="text-center">
+              <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary mx-auto">
+                {closed ? <CheckCircle2 className="w-7 h-7" /> : <Trophy className="w-7 h-7" />}
+              </span>
+              <h1 className="mt-5 font-display text-[1.75rem] sm:text-3xl font-semibold text-ink">
+                {closed ? "Hunt closed" : "Hunt complete!"}
+              </h1>
+              <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
+                {closed
+                  ? "Staff confirmed your souvenir pickup. Thanks for playing."
+                  : "Show this QR code to staff to collect your souvenir treasure."}
+              </p>
+            </div>
+          </Reveal>
+
+          {!closed && qrUrl && (
+            <Reveal delay={0.08}>
+              <div className="mt-8 rounded-[1.75rem] border border-primary/20 bg-gradient-to-b from-white to-primary/[0.04] p-6 sm:p-8 shadow-[0_8px_40px_-12px_rgba(10,77,255,0.22)]">
+                <div className="rounded-2xl bg-white p-4 sm:p-5 border border-border/80 shadow-sm mx-auto max-w-[280px]">
+                  <img
+                    src={qrUrl}
+                    alt="Staff QR code"
+                    className="w-full aspect-square rounded-xl"
+                  />
+                </div>
+                <p className="mt-5 text-center font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                  Game ID · {gameId}
+                </p>
+                <p className="mt-2 text-center text-xs text-muted-foreground">
+                  Waiting for staff confirmation…
+                </p>
+              </div>
+            </Reveal>
+          )}
+
+          {closed && (
+            <Reveal delay={0.08}>
+              <div className="mt-8 rounded-2xl border border-moss/30 bg-moss/5 px-6 py-8 text-center">
+                <p className="text-sm text-foreground/80 leading-relaxed">
+                  Your hunt is officially complete. We hope you enjoyed exploring Split.
+                </p>
+              </div>
+            </Reveal>
+          )}
+
+          <Reveal delay={0.12}>
+            <div className="mt-8 text-center">
+              <Link
+                to="/"
+                className="inline-flex items-center justify-center rounded-full bg-primary text-white px-8 py-3.5 text-sm font-medium shadow-sm hover:shadow-md transition-shadow"
+              >
+                Back home
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    );
+  }
 
   if (phase === "before") {
     const startLocation = steps[0]?.location ?? hunt.locationLabel ?? `${hunt.city}, ${hunt.country}`;
@@ -367,89 +458,6 @@ function PlayPage() {
           </button>
         </Reveal>
       </PlayIntroLayout>
-    );
-  }
-
-  if (finished || steps.length === 0) {
-    const qrUrl = staffCloseUrl
-      ? `https://quickchart.io/qr?size=280&text=${encodeURIComponent(staffCloseUrl)}`
-      : null;
-
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-10 sm:py-16 pb-28">
-        <div className="flex flex-col items-center gap-3 mb-6 sm:mb-8">
-          <div className="flex items-center gap-3">
-            <img
-              src="/assets/branding/logo-main.svg"
-              alt=""
-              aria-hidden
-              className="h-10 sm:h-12 w-auto shrink-0 object-contain [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(98%)_saturate(4688%)_hue-rotate(221deg)_brightness(101%)_contrast(103%)]"
-            />
-            <span className="font-display font-bold text-[1.35rem] sm:text-[1.65rem] leading-none text-primary tracking-tight">
-              Souvenir Hunt
-            </span>
-          </div>
-        </div>
-
-        <div className="w-full max-w-md">
-          <Reveal>
-            <div className="text-center">
-              <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary mx-auto">
-                {closed ? <CheckCircle2 className="w-7 h-7" /> : <Trophy className="w-7 h-7" />}
-              </span>
-              <h1 className="mt-5 font-display text-[1.75rem] sm:text-3xl font-semibold text-ink">
-                {closed ? "Hunt closed" : "Hunt complete!"}
-              </h1>
-              <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
-                {closed
-                  ? "Staff confirmed your souvenir pickup. Thanks for playing."
-                  : "Show this QR code to staff to collect your souvenir treasure."}
-              </p>
-            </div>
-          </Reveal>
-
-          {!closed && qrUrl && (
-            <Reveal delay={0.08}>
-              <div className="mt-8 rounded-[1.75rem] border border-primary/20 bg-gradient-to-b from-white to-primary/[0.04] p-6 sm:p-8 shadow-[0_8px_40px_-12px_rgba(10,77,255,0.22)]">
-                <div className="rounded-2xl bg-white p-4 sm:p-5 border border-border/80 shadow-sm mx-auto max-w-[280px]">
-                  <img
-                    src={qrUrl}
-                    alt="Staff QR code"
-                    className="w-full aspect-square rounded-xl"
-                  />
-                </div>
-                <p className="mt-5 text-center font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                  Game ID · {gameId}
-                </p>
-                <p className="mt-2 text-center text-xs text-muted-foreground">
-                  Waiting for staff confirmation…
-                </p>
-              </div>
-            </Reveal>
-          )}
-
-          {closed && (
-            <Reveal delay={0.08}>
-              <div className="mt-8 rounded-2xl border border-moss/30 bg-moss/5 px-6 py-8 text-center">
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  Your hunt is officially complete. We hope you enjoyed exploring Split.
-                </p>
-              </div>
-            </Reveal>
-          )}
-
-          <Reveal delay={0.12}>
-            <div className="mt-8 text-center">
-              <Link
-                to="/"
-                className="inline-flex items-center justify-center rounded-full bg-primary text-white px-8 py-3.5 text-sm font-medium shadow-sm hover:shadow-md transition-shadow"
-              >
-                Back home
-              </Link>
-            </div>
-          </Reveal>
-        </div>
-      </div>
     );
   }
 
