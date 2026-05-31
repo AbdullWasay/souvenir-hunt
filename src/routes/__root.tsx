@@ -101,20 +101,20 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {hideChrome ? (
+      {!hideChrome && <CursorGlow />}
+      {!hideChrome && <ScrollProgress />}
+      {!hideChrome && <Header />}
+      <main
+        className={
+          hideChrome ? "relative z-10 isolate min-h-screen" : "relative z-10 pt-28 isolate"
+        }
+      >
         <Outlet />
-      ) : (
-        <>
-          <CursorGlow />
-          <ScrollProgress />
-          <Header />
-          <main className="relative z-10 pt-28 isolate">
-            <Outlet />
-          </main>
-          <div className="relative z-10">
-            <Footer />
-          </div>
-        </>
+      </main>
+      {!hideChrome && (
+        <div className="relative z-10">
+          <Footer />
+        </div>
       )}
     </QueryClientProvider>
   );

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -20,6 +20,54 @@ export const Route = createFileRoute("/play/$token")({
   component: PlayPage,
 });
 
+const COMPLETE_HASH = "complete";
+
+function huntIsFinished(
+  stepCount: number,
+  stepIndex: number,
+  completedIds: string[],
+  progress: { currentStepIndex: number; completedStepIds: string[] },
+): boolean {
+  if (stepCount === 0) return true;
+  return (
+    stepIndex >= stepCount ||
+    progress.currentStepIndex >= stepCount ||
+    completedIds.length >= stepCount ||
+    progress.completedStepIds.length >= stepCount
+  );
+}
+
+function readCompleteFromSession(accessToken: string): boolean {
+  try {
+    return sessionStorage.getItem(`play-complete:${accessToken}`) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function markCompleteInSession(accessToken: string) {
+  try {
+    sessionStorage.setItem(`play-complete:${accessToken}`, "1");
+  } catch {
+    // ignore private mode / quota errors
+  }
+}
+
+function resolveInitialStepIndex(
+  stepCount: number,
+  progress: { currentStepIndex: number; completedStepIds: string[] },
+  accessToken: string,
+): number {
+  if (stepCount === 0) return 0;
+  if (typeof window !== "undefined") {
+    const hash = window.location.hash.replace(/^#/, "");
+    if (hash === COMPLETE_HASH || readCompleteFromSession(accessToken)) return stepCount;
+  }
+  if (progress.currentStepIndex >= stepCount) return progress.currentStepIndex;
+  if (progress.completedStepIds.length >= stepCount) return stepCount;
+  return progress.currentStepIndex;
+}
+
 function initialPhase(
   progress: {
     currentStepIndex: number;
@@ -27,8 +75,15 @@ function initialPhase(
     introCompleted?: boolean;
   },
   stepCount: number,
+  accessToken: string,
 ): "before" | "guidelines" | "playing" {
-  if (stepCount > 0 && progress.currentStepIndex >= stepCount) return "playing";
+  if (huntIsFinished(stepCount, progress.currentStepIndex, progress.completedStepIds, progress)) {
+    return "playing";
+  }
+  if (typeof window !== "undefined") {
+    const hash = window.location.hash.replace(/^#/, "");
+    if (hash === COMPLETE_HASH || readCompleteFromSession(accessToken)) return "playing";
+  }
   if (
     progress.introCompleted ||
     progress.currentStepIndex > 0 ||
@@ -124,22 +179,31 @@ function PlayPage() {
 
   const { hunt, progress, order } = data;
   const steps = hunt.steps ?? [];
-  const [stepIndex, setStepIndex] = useState(progress.currentStepIndex);
-  const [viewIndex, setViewIndex] = useState(progress.currentStepIndex);
+  const hash = useRouterState({ select: (s) => s.location.hash.replace(/^#/, "") });
+  const isCompleteHash = hash === COMPLETE_HASH;
+  const [stepIndex, setStepIndex] = useState(() =>
+    resolveInitialStepIndex(steps.length, progress, order.accessToken),
+  );
+  const [viewIndex, setViewIndex] = useState(() =>
+    resolveInitialStepIndex(steps.length, progress, order.accessToken),
+  );
   const [completed, setCompleted] = useState<string[]>(progress.completedStepIds);
   const [activeTab, setActiveTab] = useState<"story" | "history" | "clue" | "guide">("story");
   const [answer, setAnswer] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [closed, setClosed] = useState(Boolean(progress.closedAt));
   const [phase, setPhase] = useState<"before" | "guidelines" | "playing">(() =>
-    initialPhase(progress, steps.length),
+    initialPhase(progress, steps.length, order.accessToken),
   );
   const [revealedHints, setRevealedHints] = useState(progress.revealedHints ?? 0);
   const [saving, setSaving] = useState(false);
 
   const step = steps[viewIndex];
   const activeStep = steps[stepIndex];
-  const finished = stepIndex >= steps.length;
+  const finished =
+    huntIsFinished(steps.length, stepIndex, completed, progress) ||
+    isCompleteHash ||
+    readCompleteFromSession(order.accessToken);
   const hints = activeStep?.hints ?? [];
   const gameId = order.accessToken.slice(5, 13).toUpperCase();
   const progressPct =
@@ -233,6 +297,9 @@ function PlayPage() {
     if (stepAcceptsAnswer(activeStep, answer)) {
       const nextCompleted = [...completed, activeStep.id];
       const nextIndex = stepIndex + 1;
+      if (nextIndex >= steps.length) {
+        markCompleteInSession(order.accessToken);
+      }
       setCompleted(nextCompleted);
       setStepIndex(nextIndex);
       setViewIndex(nextIndex);
