@@ -15,7 +15,14 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "A clean self-guided city hunt with hidden stories, playful clues, and a keepsake at the end." },
     ],
   }),
-  loader: () => listPublicHunts(),
+  loader: async () => {
+    try {
+      return await listPublicHunts();
+    } catch (error) {
+      console.error("Failed to load hunts for homepage:", error);
+      return [];
+    }
+  },
   component: Home,
 });
 

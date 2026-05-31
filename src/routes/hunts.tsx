@@ -12,7 +12,14 @@ export const Route = createFileRoute("/hunts")({
       { name: "description", content: "Explore our community of self-guided city hunts across countries and cities." },
     ],
   }),
-  loader: () => listPublicHunts(),
+  loader: async () => {
+    try {
+      return await listPublicHunts();
+    } catch (error) {
+      console.error("Failed to load hunts:", error);
+      return [];
+    }
+  },
   component: HuntsPage,
 });
 
