@@ -88,7 +88,7 @@ function Hero() {
       <div className="max-w-7xl mx-auto px-6 pt-2 pb-32 relative z-10">
 
 
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+        <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
           className="stamp text-primary mb-10 bg-white/70 backdrop-blur">
           <Sparkles className="w-3 h-3" /> Made by local artists
         </motion.div>
@@ -97,7 +97,7 @@ function Hero() {
           {["Explore", "the city.", "Solve clues.", "Keep the story."].map((line, i) => (
             <motion.span
               key={line}
-              initial={{ opacity: 0, y: 40 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.15 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
               className="block"
@@ -108,7 +108,7 @@ function Hero() {
         </motion.h1>
 
         <motion.div
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.8 }}
+          initial={false} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.8 }}
           className="mt-12 max-w-3xl"
         >
           <p className="text-base md:text-lg text-foreground/80 leading-relaxed max-w-md">
@@ -131,7 +131,7 @@ function Hero() {
 
         {/* Stats strip */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2, duration: 0.8 }}
+          initial={false} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2, duration: 0.8 }}
           className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-px bg-border rounded-2xl overflow-hidden border border-border shadow-paper"
         >
           {[
@@ -231,7 +231,7 @@ function About() {
             {journey.map((step, i) => (
               <Reveal key={step.title} delay={i * 0.08}>
                 <motion.div
-                  initial={{ opacity: 0, x: 36 }}
+                  initial={{ opacity: 1, x: 36 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ amount: 0.35 }}
                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: i * 0.05 }}
@@ -300,7 +300,7 @@ function Artists() {
           {skills.map((s, i) => (
             <Reveal key={s.label} delay={i * 0.08}>
               <motion.div
-                initial={{ opacity: 0, y: 28 }}
+                initial={{ opacity: 1, y: 28 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ amount: 0.35 }}
                 transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: i * 0.07 }}
@@ -344,7 +344,7 @@ function Reviews() {
         <div className="grid lg:grid-cols-12 gap-5 md:gap-6">
           <Reveal className="lg:col-span-7">
             <motion.article
-              initial={{ opacity: 0, y: 28, scale: 0.98 }}
+              initial={{ opacity: 1, y: 28, scale: 0.98 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ amount: 0.25 }}
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -379,7 +379,7 @@ function Reviews() {
             {more.map((r, i) => (
               <Reveal key={r.name} delay={0.08 + i * 0.06}>
                 <motion.article
-                  initial={{ opacity: 0, x: 24 }}
+                  initial={{ opacity: 1, x: 24 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ amount: 0.4 }}
                   transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}

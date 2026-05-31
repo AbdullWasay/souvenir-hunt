@@ -14,7 +14,7 @@ export function Reveal({ children, delay = 0, y = 24, className, as = "div" }: R
   const Component = motion[as] as typeof motion.div;
   return (
     <Component
-      initial={reduce ? false : { opacity: 0, y }}
+      initial={reduce ? false : { opacity: 1, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }}
