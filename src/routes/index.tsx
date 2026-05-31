@@ -3,6 +3,7 @@ import { motion, useInView, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Play, MapPin, Compass, Sparkles, Quote, Key, Footprints, Star, Send, Milestone, Gift, Brain } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
+import { AnimateIn } from "@/components/site/AnimateIn";
 import { Marquee } from "@/components/site/Marquee";
 import { HomeHuntsSection } from "@/components/site/HomeHuntsSection";
 import { CompassRose } from "@/components/site/CompassRose";
@@ -88,29 +89,25 @@ function Hero() {
       <div className="max-w-7xl mx-auto px-6 pt-2 pb-32 relative z-10">
 
 
-        <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-          className="stamp text-primary mb-10 bg-white/70 backdrop-blur">
+        <AnimateIn y={12} className="stamp text-primary mb-10 bg-white/70 backdrop-blur">
           <Sparkles className="w-3 h-3" /> Made by local artists
-        </motion.div>
+        </AnimateIn>
 
         <motion.h1 style={{ y: yTitle }} className="font-display text-[clamp(2.25rem,6vw,4.75rem)] leading-[1.02] tracking-[-0.03em] text-foreground max-w-4xl text-balance">
           {["Explore", "the city.", "Solve clues.", "Keep the story."].map((line, i) => (
-            <motion.span
+            <AnimateIn
               key={line}
-              initial={false}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.15 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+              as="span"
+              y={40}
+              delay={0.15 + i * 0.12}
               className="block"
             >
               {i === 2 ? <span className="text-gradient animate-gradient">{line}</span> : line}
-            </motion.span>
+            </AnimateIn>
           ))}
         </motion.h1>
 
-        <motion.div
-          initial={false} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.8 }}
-          className="mt-12 max-w-3xl"
-        >
+        <AnimateIn delay={0.9} className="mt-12 max-w-3xl">
           <p className="text-base md:text-lg text-foreground/80 leading-relaxed max-w-md">
             A clean, self-guided city hunt with hidden stories, playful clues, and a keepsake at the end.
           </p>
@@ -127,13 +124,10 @@ function Hero() {
               <span className="ink-underline">Continue your hunt</span>
             </Link>
           </div>
-        </motion.div>
+        </AnimateIn>
 
         {/* Stats strip */}
-        <motion.div
-          initial={false} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2, duration: 0.8 }}
-          className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-px bg-border rounded-2xl overflow-hidden border border-border shadow-paper"
-        >
+        <AnimateIn y={30} delay={1.2} className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-px bg-border rounded-2xl overflow-hidden border border-border shadow-paper">
           {[
             { value: 4, suffix: "", label: "Countries", icon: MapPin },
             { value: 7, suffix: "", label: "Cities mapped", icon: Compass },
@@ -155,7 +149,7 @@ function Hero() {
               <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-hero-gradient group-hover:w-full transition-all duration-500" />
             </motion.div>
           ))}
-        </motion.div>
+        </AnimateIn>
 
       </div>
     </section>
@@ -164,7 +158,7 @@ function Hero() {
 
 function KpiCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const inView = useInView(ref, { once: true, amount: 0.6 });
   const [value, setValue] = useState(0);
 
   useEffect(() => {
@@ -229,29 +223,27 @@ function About() {
 
           <div className="lg:col-span-7 space-y-0">
             {journey.map((step, i) => (
-              <Reveal key={step.title} delay={i * 0.08}>
-                <motion.div
-                  initial={{ opacity: 1, x: 36 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ amount: 0.35 }}
-                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: i * 0.05 }}
-                  className="relative flex gap-6 md:gap-8 pb-12 last:pb-0 group"
-                >
-                  {i < journey.length - 1 && (
-                    <span className="absolute left-[23px] md:left-[27px] top-14 bottom-0 w-px bg-gradient-to-b from-primary/40 to-transparent" />
-                  )}
-                  <span className="relative z-10 grid place-items-center w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-2xl bg-primary text-white shadow-paper group-hover:scale-105 transition-transform">
-                    <step.icon className="w-5 h-5 md:w-6 md:h-6" strokeWidth={1.5} />
+              <AnimateIn
+                key={step.title}
+                trigger="inView"
+                x={36}
+                delay={i * 0.05}
+                className="relative flex gap-6 md:gap-8 pb-12 last:pb-0 group"
+              >
+                {i < journey.length - 1 && (
+                  <span className="absolute left-[23px] md:left-[27px] top-14 bottom-0 w-px bg-gradient-to-b from-primary/40 to-transparent" />
+                )}
+                <span className="relative z-10 grid place-items-center w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-2xl bg-primary text-white shadow-paper group-hover:scale-105 transition-transform">
+                  <step.icon className="w-5 h-5 md:w-6 md:h-6" strokeWidth={1.5} />
+                </span>
+                <article className="flex-1 pt-1 pb-2">
+                  <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-muted-foreground">
+                    Step 0{i + 1}
                   </span>
-                  <article className="flex-1 pt-1 pb-2">
-                    <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-muted-foreground">
-                      Step 0{i + 1}
-                    </span>
-                    <h3 className="mt-2 font-display text-2xl md:text-3xl text-ink">{step.title}</h3>
-                    <p className="mt-3 text-foreground/70 leading-relaxed max-w-lg">{step.body}</p>
-                  </article>
-                </motion.div>
-              </Reveal>
+                  <h3 className="mt-2 font-display text-2xl md:text-3xl text-ink">{step.title}</h3>
+                  <p className="mt-3 text-foreground/70 leading-relaxed max-w-lg">{step.body}</p>
+                </article>
+              </AnimateIn>
             ))}
           </div>
         </div>
@@ -298,20 +290,17 @@ function Artists() {
 
         <div className="space-y-px bg-parchment/10 rounded-3xl overflow-hidden border border-parchment/10">
           {skills.map((s, i) => (
-            <Reveal key={s.label} delay={i * 0.08}>
-              <motion.div
-                initial={{ opacity: 1, y: 28 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ amount: 0.35 }}
-                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: i * 0.07 }}
-                whileHover={{ x: 6 }}
-                className="grid md:grid-cols-12 items-center bg-ink px-6 md:px-10 py-10 md:py-12 group hover:bg-ink/80 transition-colors"
-              >
-                <span className="md:col-span-1 font-mono text-xs text-amber-seal">0{i + 1}</span>
-                <h3 className="md:col-span-4 font-display text-2xl md:text-4xl mt-2 md:mt-0">{s.label}</h3>
-                <p className="md:col-span-7 mt-3 md:mt-0 text-parchment/70 text-base md:text-lg leading-relaxed">{s.body}</p>
-              </motion.div>
-            </Reveal>
+            <AnimateIn
+              key={s.label}
+              trigger="inView"
+              y={28}
+              delay={i * 0.07}
+              className="grid md:grid-cols-12 items-center bg-ink px-6 md:px-10 py-10 md:py-12 group hover:bg-ink/80 transition-colors"
+            >
+              <span className="md:col-span-1 font-mono text-xs text-amber-seal">0{i + 1}</span>
+              <h3 className="md:col-span-4 font-display text-2xl md:text-4xl mt-2 md:mt-0">{s.label}</h3>
+              <p className="md:col-span-7 mt-3 md:mt-0 text-parchment/70 text-base md:text-lg leading-relaxed">{s.body}</p>
+            </AnimateIn>
           ))}
         </div>
       </div>
@@ -342,15 +331,13 @@ function Reviews() {
         </Reveal>
 
         <div className="grid lg:grid-cols-12 gap-5 md:gap-6">
-          <Reveal className="lg:col-span-7">
-            <motion.article
-              initial={{ opacity: 1, y: 28, scale: 0.98 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ amount: 0.25 }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -4 }}
-              className="relative h-full min-h-[320px] rounded-[2rem] overflow-hidden bg-ink text-parchment p-8 md:p-12 flex flex-col justify-between"
-            >
+          <AnimateIn
+            as="article"
+            trigger="inView"
+            y={28}
+            scale={0.98}
+            className="lg:col-span-7 relative h-full min-h-[320px] rounded-[2rem] overflow-hidden bg-ink text-parchment p-8 md:p-12 flex flex-col justify-between"
+          >
               <div className="absolute inset-0 opacity-40" style={{ backgroundImage: "radial-gradient(circle at 20% 0%, oklch(0.55 0.2 45 / 0.5), transparent 55%), radial-gradient(circle at 90% 100%, oklch(0.45 0.15 250 / 0.4), transparent 50%)" }} />
               <div className="relative">
                 <div className="flex gap-1 text-amber-seal mb-8">
@@ -372,21 +359,19 @@ function Reviews() {
                   <MapPin className="w-3 h-3" /> {featured.city}
                 </span>
               </div>
-            </motion.article>
-          </Reveal>
+          </AnimateIn>
 
           <div className="lg:col-span-5 flex flex-col gap-5 md:gap-6">
             {more.map((r, i) => (
-              <Reveal key={r.name} delay={0.08 + i * 0.06}>
-                <motion.article
-                  initial={{ opacity: 1, x: 24 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ amount: 0.4 }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  whileHover={{ y: -3 }}
-                  className={`paper-card rounded-2xl p-7 flex flex-col justify-between h-full ${i === 0 ? "bg-amber-seal/8 border-amber-seal/25" : ""}`}
-                  style={i === 1 ? { transform: "rotate(0.6deg)" } : undefined}
-                >
+              <AnimateIn
+                key={r.name}
+                as="article"
+                trigger="inView"
+                x={24}
+                delay={i * 0.06}
+                className={`paper-card rounded-2xl p-7 flex flex-col justify-between h-full ${i === 0 ? "bg-amber-seal/8 border-amber-seal/25" : ""}`}
+                style={i === 1 ? { transform: "rotate(0.6deg)" } : undefined}
+              >
                   <div>
                     <div className="flex gap-1 text-amber-seal mb-4">
                       {Array.from({ length: 5 }).map((_, j) => (
@@ -402,8 +387,7 @@ function Reviews() {
                     </div>
                     <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{r.city}</span>
                   </div>
-                </motion.article>
-              </Reveal>
+              </AnimateIn>
             ))}
 
             <Reveal delay={0.2}>
