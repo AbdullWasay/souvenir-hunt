@@ -5,14 +5,7 @@ import { nitro } from "nitro/vite";
 import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
-
-const serverExternals = [
-  "mongodb",
-  "bson",
-  "bcryptjs",
-  "stripe",
-  "@emotion/is-prop-valid",
-];
+import { injectCjsRequire } from "./vite.inject-cjs-require";
 
 const isBuild = process.argv.includes("build");
 const deployTarget = process.env.DEPLOY_TARGET ?? (process.env.VERCEL ? "vercel" : "cloudflare");
@@ -26,10 +19,8 @@ export default defineConfig({
       ? [
           nitro({
             preset: "vercel",
-            rollupConfig: {
-              external: serverExternals,
-            },
           }),
+          injectCjsRequire(),
         ]
       : []),
     tailwindcss(),
@@ -39,20 +30,4 @@ export default defineConfig({
     }),
     viteReact(),
   ],
-  ...(isBuild && deployTarget === "vercel"
-    ? {
-        environments: {
-          ssr: {
-            build: {
-              rollupOptions: {
-                external: serverExternals,
-              },
-            },
-            resolve: {
-              external: serverExternals,
-            },
-          },
-        },
-      }
-    : {}),
 });
