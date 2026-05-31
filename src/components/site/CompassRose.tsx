@@ -1,53 +1,53 @@
-import { motion, useScroll, useTransform, useSpring, MotionValue } from "motion/react";
-import { useRef } from "react";
+import { motion, useScroll, useTransform, useSpring, type MotionValue } from "motion/react";
 
 interface Props {
-  progress?: MotionValue<number>;
+  scrollYProgress?: MotionValue<number>;
   className?: string;
-  /** When true, react to scroll immediately (no spring lag). */
-  immediate?: boolean;
+  rotateRange?: [number, number];
+  spinDuration?: number;
+  counterSpin?: boolean;
+  /** Softer strokes + slower scroll-linked rotation */
+  gentle?: boolean;
 }
 
-/** Artistic cartographer's compass rose. Rotates with scroll. */
-export function CompassRose({ progress, className, immediate }: Props) {
-  const ref = useRef<SVGSVGElement>(null);
-  const { scrollYProgress } = useScroll();
-  const source = progress ?? scrollYProgress;
-  const rotateRaw = useTransform(source, [0, 1], [0, 540]);
-  const rotateSpring = useSpring(rotateRaw, { stiffness: 120, damping: 22, mass: 0.4 });
-  const rotate = immediate ? rotateRaw : rotateSpring;
-  const counter = useTransform(rotate, (r) => -r);
+/** Cartographer's compass rose — scroll-linked rotation varies per page. */
+export function CompassRose({
+  scrollYProgress,
+  className,
+  rotateRange = [0, 540],
+  spinDuration = 40,
+  counterSpin = false,
+  gentle = false,
+}: Props) {
+  const { scrollYProgress: defaultProgress } = useScroll();
+  const source = scrollYProgress ?? defaultProgress;
+  const rotateRaw = useTransform(source, [0, 1], rotateRange);
+  const rotate = useSpring(
+    rotateRaw,
+    gentle
+      ? { stiffness: 8, damping: 32, mass: 2.5 }
+      : { stiffness: 80, damping: 24, mass: 0.5 },
+  );
+  const strokeMul = gentle ? 1.05 : 1;
+  const counter = useTransform(rotate, (r) => (counterSpin ? r * 0.35 : -r * 0.2));
 
-  // ticks: 72 around (every 5°), longer every 15°, longest at cardinals
   const ticks = Array.from({ length: 72 }, (_, i) => i);
 
   return (
-    <svg
-      ref={ref}
+    <motion.svg
       viewBox="-200 -200 400 400"
       className={className}
       fill="none"
       aria-hidden
+      animate={{ rotate: counterSpin ? [0, 360] : [0, -360] }}
+      transition={{ duration: spinDuration, repeat: Infinity, ease: "linear" }}
     >
-      {/* sheet labels (counter-rotate so they stay upright) */}
-      <motion.g style={{ rotate: counter }} className="font-mono">
-        <text x="120" y="-150" fontSize="9" fill="currentColor" opacity="0.6" letterSpacing="2">
-          SHEET 01 / 04
-        </text>
-        <text x="120" y="-135" fontSize="9" fill="currentColor" opacity="0.6" letterSpacing="2">
-          SCALE 1:8000
-        </text>
-      </motion.g>
-
-      {/* outer ring with rotation */}
       <motion.g style={{ rotate }}>
-        {/* concentric rings */}
-        <circle r="180" stroke="currentColor" strokeWidth="0.8" opacity="0.35" />
-        <circle r="140" stroke="currentColor" strokeWidth="0.6" opacity="0.25" strokeDasharray="2 4" />
-        <circle r="95" stroke="currentColor" strokeWidth="0.6" opacity="0.3" />
-        <circle r="55" stroke="currentColor" strokeWidth="0.6" opacity="0.3" />
+        <circle r="180" stroke="currentColor" strokeWidth="0.8" opacity={0.35 * strokeMul} />
+        <circle r="140" stroke="currentColor" strokeWidth="0.6" opacity={0.25 * strokeMul} strokeDasharray="2 4" />
+        <circle r="95" stroke="currentColor" strokeWidth="0.6" opacity={0.3 * strokeMul} />
+        <circle r="55" stroke="currentColor" strokeWidth="0.6" opacity={0.3 * strokeMul} />
 
-        {/* ticks */}
         {ticks.map((i) => {
           const angle = i * 5;
           const isCardinal = i % 18 === 0;
@@ -63,13 +63,12 @@ export function CompassRose({ progress, className, immediate }: Props) {
               y2={-outer}
               stroke="currentColor"
               strokeWidth={isCardinal ? 1.4 : isMajor ? 0.9 : 0.5}
-              opacity={isCardinal ? 0.9 : isMajor ? 0.6 : 0.35}
+              opacity={(isCardinal ? 0.9 : isMajor ? 0.6 : 0.35) * strokeMul}
               transform={`rotate(${angle})`}
             />
           );
         })}
 
-        {/* cardinal letters - rotate with the rose */}
         {[
           { l: "N", x: 0, y: -120 },
           { l: "E", x: 120, y: 4 },
@@ -85,29 +84,16 @@ export function CompassRose({ progress, className, immediate }: Props) {
             fill="currentColor"
             opacity="0.75"
             textAnchor="middle"
-            letterSpacing="1"
           >
             {c.l}
           </text>
         ))}
 
-        {/* needle - elongated diamond N/S */}
-        <polygon
-          points="0,-150 8,0 0,150 -8,0"
-          fill="currentColor"
-          opacity="0.55"
-        />
-        {/* perpendicular E/W needle (lighter) */}
-        <polygon
-          points="-150,0 0,-6 150,0 0,6"
-          fill="currentColor"
-          opacity="0.28"
-        />
-
-        {/* center hub */}
-        <circle r="9" fill="currentColor" opacity="0.85" />
+        <polygon points="0,-150 8,0 0,150 -8,0" fill="currentColor" opacity={0.55 * strokeMul} />
+        <polygon points="-150,0 0,-6 150,0 0,6" fill="currentColor" opacity={0.28 * strokeMul} />
+        <circle r="9" fill="currentColor" opacity={0.85 * strokeMul} />
         <circle r="4" fill="#fff" />
       </motion.g>
-    </svg>
+    </motion.svg>
   );
 }

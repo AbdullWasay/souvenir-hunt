@@ -1,52 +1,159 @@
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useScroll, useTransform, useSpring } from "motion/react";
 import { useRouterState } from "@tanstack/react-router";
 import { CompassRose } from "./CompassRose";
 
-type Variant = {
-  x: [string, string, string];
-  y: [string, string, string];
-  side: "right" | "left";
+/**
+ * Wander path stays in left/right gutters only (never over centered content).
+ * Progress is heavily spring-lagged so movement feels very slow vs scroll.
+ */
+const HOME_FRAMES = {
+  progress: [0, 0.12, 0.24, 0.36, 0.48, 0.6, 0.72, 0.84, 0.96, 1],
+  left: [90, 8, 88, 10, 90, 8, 88, 10, 90, 8],
+  top: [12, 20, 32, 44, 54, 64, 74, 82, 90, 96],
+  opacity: [0.42, 0.38, 0.42, 0.36, 0.4, 0.34, 0.38, 0.34, 0.36, 0.32],
+  scale: [0.88, 0.86, 0.88, 0.84, 0.86, 0.84, 0.86, 0.82, 0.84, 0.8],
+};
+
+/** Very heavy spring — compass drifts long after you stop scrolling. */
+const SLOW_SPRING = { stiffness: 3, damping: 42, mass: 6, restDelta: 0.0005 };
+
+type PageVariant = {
+  left: number[];
+  top: number[];
+  opacity: number[];
+  scale?: number[];
   size: string;
-  top: string;
-  opacity: [number, number, number, number];
+  rotateRange: [number, number];
+  spinDuration: number;
+  counterSpin: boolean;
 };
 
-// For side:"right" with right:0, NEGATIVE x pulls the compass into view.
-// For side:"left" with left:0, POSITIVE x pulls it into view.
-const variants: Record<string, Variant> = {
-  "/":         { x: ["-18vw", "-32vw", "-8vw"], y: ["2vh",  "10vh", "-4vh"], side: "right", size: "70vh", top: "14vh", opacity: [0.38, 0.45, 0.4, 0.22] },
-  "/hunts":    { x: ["10vw",  "28vw",  "6vw"],  y: ["4vh",  "-6vh", "10vh"], side: "left",  size: "60vh", top: "18vh", opacity: [0.32, 0.42, 0.36, 0.18] },
-  "/your-hunt":{ x: ["-12vw", "-30vw", "-6vw"], y: ["-5vh", "12vh", "0vh"],  side: "right", size: "65vh", top: "20vh", opacity: [0.3, 0.4, 0.34, 0.18] },
-  "/about":    { x: ["8vw",   "26vw",  "4vw"],  y: ["10vh", "-5vh", "8vh"],  side: "left",  size: "75vh", top: "10vh", opacity: [0.34, 0.44, 0.34, 0.18] },
-  "/artists":  { x: ["-14vw", "-28vw", "-10vw"],y: ["0vh",  "15vh", "-8vh"], side: "right", size: "55vh", top: "22vh", opacity: [0.32, 0.4, 0.38, 0.2] },
-  "/reviews":  { x: ["12vw",  "30vw",  "6vw"],  y: ["6vh",  "-10vh","4vh"],  side: "left",  size: "65vh", top: "16vh", opacity: [0.3, 0.42, 0.34, 0.18] },
-  "/contact":  { x: ["-10vw", "-26vw", "-16vw"],y: ["-8vh", "10vh", "-2vh"], side: "right", size: "70vh", top: "12vh", opacity: [0.34, 0.44, 0.36, 0.2] },
-  "/admin":    { x: ["-8vw",  "-20vw", "-4vw"], y: ["0vh",  "6vh",  "-2vh"], side: "right", size: "50vh", top: "20vh", opacity: [0.18, 0.22, 0.2, 0.1] },
+const pageVariants: Record<string, PageVariant> = {
+  "/hunts": {
+    left: [88, 10, 86, 12, 88],
+    top: [14, 38, 58, 78, 92],
+    opacity: [0.2, 0.18, 0.2, 0.16, 0.14],
+    size: "min(30vh, 280px)",
+    rotateRange: [0, 120],
+    spinDuration: 160,
+    counterSpin: true,
+  },
+  "/your-hunt": {
+    left: [10, 88, 12, 86, 10],
+    top: [16, 42, 60, 80, 94],
+    opacity: [0.2, 0.18, 0.2, 0.16, 0.14],
+    size: "min(28vh, 260px)",
+    rotateRange: [0, 90],
+    spinDuration: 140,
+    counterSpin: false,
+  },
 };
 
-export function StickyCompass() {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const v = variants[pathname] ?? variants["/"];
+function matchPageVariant(pathname: string): PageVariant | "home" {
+  if (pathname === "/") return "home";
+  if (pathname.startsWith("/hunts/")) return pageVariants["/hunts"];
+  return pageVariants[pathname] ?? pageVariants["/hunts"];
+}
+
+function WanderingCompass({
+  frames,
+  size,
+  rotateRange,
+  spinDuration,
+  counterSpin,
+  gentle = true,
+}: {
+  frames: {
+    progress: number[];
+    left: number[];
+    top: number[];
+    opacity: number[];
+    scale: number[];
+  };
+  size: string;
+  rotateRange: [number, number];
+  spinDuration: number;
+  counterSpin: boolean;
+  gentle?: boolean;
+}) {
   const { scrollYProgress } = useScroll();
-  const x = useTransform(scrollYProgress, [0, 0.5, 1], v.x);
-  const y = useTransform(scrollYProgress, [0, 0.5, 1], v.y);
-  const opacity = useTransform(scrollYProgress, [0, 0.05, 0.9, 1], v.opacity);
+  const eased = useTransform(scrollYProgress, (p) => p ** 0.75);
+  const smooth = useSpring(eased, SLOW_SPRING);
+
+  const left = useTransform(smooth, frames.progress, frames.left);
+  const top = useTransform(smooth, frames.progress, frames.top);
+  const opacity = useTransform(smooth, frames.progress, frames.opacity);
+  const scale = useTransform(smooth, frames.progress, frames.scale);
+
+  const leftPos = useTransform(left, (v) => `${v}%`);
+  const topPos = useTransform(top, (v) => `${v}%`);
 
   return (
     <motion.div
       aria-hidden
-      style={{
-        x,
-        y,
-        opacity,
-        top: v.top,
-        width: v.size,
-        height: v.size,
-        ...(v.side === "right" ? { right: 0 } : { left: 0 }),
-      }}
-      className="pointer-events-none fixed z-0 hidden md:block text-primary"
+      className="pointer-events-none fixed inset-0 z-[1] hidden md:block min-h-[100vh]"
     >
-      <CompassRose progress={scrollYProgress} className="w-full h-full" immediate />
+      <motion.div
+        className="absolute text-primary/[0.42]"
+        style={{
+          left: leftPos,
+          top: topPos,
+          x: "-50%",
+          y: "-50%",
+          width: size,
+          height: size,
+          opacity,
+          scale,
+        }}
+      >
+        <CompassRose
+          scrollYProgress={smooth}
+          rotateRange={rotateRange}
+          spinDuration={spinDuration}
+          counterSpin={counterSpin}
+          gentle={gentle}
+          className="w-full h-full"
+        />
+      </motion.div>
     </motion.div>
+  );
+}
+
+export function StickyCompass() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  if (pathname.startsWith("/admin")) return null;
+
+  if (pathname === "/") {
+    return (
+      <WanderingCompass
+        frames={HOME_FRAMES}
+        size="min(30vh, 280px)"
+        rotateRange={[0, 90]}
+        spinDuration={200}
+        counterSpin={false}
+        gentle
+      />
+    );
+  }
+
+  const v = matchPageVariant(pathname);
+  if (v === "home") return null;
+
+  const progress = [0, 0.25, 0.5, 0.75, 1];
+  return (
+    <WanderingCompass
+      frames={{
+        progress,
+        left: v.left,
+        top: v.top,
+        opacity: v.opacity,
+        scale: v.scale ?? [0.88, 0.86, 0.84, 0.82, 0.8],
+      }}
+      size={v.size}
+      rotateRange={v.rotateRange}
+      spinDuration={v.spinDuration}
+      counterSpin={v.counterSpin}
+      gentle
+    />
   );
 }

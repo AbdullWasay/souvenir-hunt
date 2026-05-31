@@ -1,6 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { Compass } from "lucide-react";
 
+const homeSections = [
+  { hash: "about", label: "About" },
+  { hash: "artists", label: "Artists" },
+  { hash: "hunts", label: "Hunts" },
+  { hash: "reviews", label: "Reviews" },
+  { hash: "contact", label: "Contact" },
+] as const;
+
 export function Footer() {
   return (
     <footer className="mt-32 border-t border-border bg-ink text-parchment relative overflow-hidden">
@@ -31,27 +39,22 @@ export function Footer() {
           </div>
 
           <div className="md:col-span-3">
-            <p className="text-xs uppercase tracking-[0.2em] text-parchment/50 mb-5">Explore</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-parchment/50 mb-5">Play</p>
             <ul className="space-y-3 text-parchment/80">
               <li><Link to="/hunts" className="hover:text-amber-seal transition-colors">All hunts</Link></li>
-              <li><Link to="/your-hunt" className="hover:text-amber-seal transition-colors">Resume hunt</Link></li>
-              <li><Link to="/about" className="hover:text-amber-seal transition-colors">About</Link></li>
+              <li><Link to="/your-hunt" className="hover:text-amber-seal transition-colors">Your hunt</Link></li>
             </ul>
           </div>
-          <div className="md:col-span-2">
-            <p className="text-xs uppercase tracking-[0.2em] text-parchment/50 mb-5">Studio</p>
-            <ul className="space-y-3 text-parchment/80">
-              <li><Link to="/artists" className="hover:text-amber-seal transition-colors">Artists</Link></li>
-              <li><Link to="/reviews" className="hover:text-amber-seal transition-colors">Reviews</Link></li>
-              <li><Link to="/contact" className="hover:text-amber-seal transition-colors">Contact</Link></li>
-            </ul>
-          </div>
-          <div className="md:col-span-2">
-            <p className="text-xs uppercase tracking-[0.2em] text-parchment/50 mb-5">Index</p>
-            <ul className="space-y-3 text-parchment/80 font-mono text-sm">
-              <li>4 countries</li>
-              <li>7 cities</li>
-              <li>1 live hunt</li>
+          <div className="md:col-span-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-parchment/50 mb-5">On this page</p>
+            <ul className="grid grid-cols-2 gap-x-6 gap-y-3 text-parchment/80">
+              {homeSections.map((s) => (
+                <li key={s.hash}>
+                  <Link to="/" hash={s.hash} className="hover:text-amber-seal transition-colors">
+                    {s.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

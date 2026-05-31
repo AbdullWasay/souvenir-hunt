@@ -1,6 +1,6 @@
 // Lightweight client-side store for the admin panel.
 // Persists hunts/steps/hints to localStorage so the admin can prototype games
-// without a backend. Swap to Lovable Cloud later if needed.
+// without a backend. Swap to a real API when you add a backend.
 
 export type Hint = {
   id: string;

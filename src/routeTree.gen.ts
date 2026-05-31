@@ -14,9 +14,16 @@ import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as HuntsRouteImport } from './routes/hunts'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ArtistsRouteImport } from './routes/artists'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as PlayTokenRouteImport } from './routes/play.$token'
+import { Route as HuntsSlugRouteImport } from './routes/hunts.$slug'
+import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
+import { Route as CheckoutSlugRouteImport } from './routes/checkout.$slug'
+import { Route as ApiStripeWebhookRouteImport } from './routes/api/stripe-webhook'
+import { Route as StaffCloseTokenRouteImport } from './routes/staff.close.$token'
 
 const YourHuntRoute = YourHuntRouteImport.update({
   id: '/your-hunt',
@@ -43,14 +50,14 @@ const ArtistsRoute = ArtistsRouteImport.update({
   path: '/artists',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -58,80 +65,160 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const PlayTokenRoute = PlayTokenRouteImport.update({
+  id: '/play/$token',
+  path: '/play/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HuntsSlugRoute = HuntsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => HuntsRoute,
+} as any)
+const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
+  id: '/checkout/success',
+  path: '/checkout/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutSlugRoute = CheckoutSlugRouteImport.update({
+  id: '/checkout/$slug',
+  path: '/checkout/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiStripeWebhookRoute = ApiStripeWebhookRouteImport.update({
+  id: '/api/stripe-webhook',
+  path: '/api/stripe-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffCloseTokenRoute = StaffCloseTokenRouteImport.update({
+  id: '/staff/close/$token',
+  path: '/staff/close/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
   '/artists': typeof ArtistsRoute
   '/contact': typeof ContactRoute
-  '/hunts': typeof HuntsRoute
+  '/hunts': typeof HuntsRouteWithChildren
   '/reviews': typeof ReviewsRoute
   '/your-hunt': typeof YourHuntRoute
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
+  '/checkout/$slug': typeof CheckoutSlugRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
+  '/hunts/$slug': typeof HuntsSlugRoute
+  '/play/$token': typeof PlayTokenRoute
+  '/admin/': typeof AdminIndexRoute
+  '/staff/close/$token': typeof StaffCloseTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
   '/artists': typeof ArtistsRoute
   '/contact': typeof ContactRoute
-  '/hunts': typeof HuntsRoute
+  '/hunts': typeof HuntsRouteWithChildren
   '/reviews': typeof ReviewsRoute
   '/your-hunt': typeof YourHuntRoute
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
+  '/checkout/$slug': typeof CheckoutSlugRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
+  '/hunts/$slug': typeof HuntsSlugRoute
+  '/play/$token': typeof PlayTokenRoute
+  '/admin': typeof AdminIndexRoute
+  '/staff/close/$token': typeof StaffCloseTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
   '/artists': typeof ArtistsRoute
   '/contact': typeof ContactRoute
-  '/hunts': typeof HuntsRoute
+  '/hunts': typeof HuntsRouteWithChildren
   '/reviews': typeof ReviewsRoute
   '/your-hunt': typeof YourHuntRoute
+  '/api/stripe-webhook': typeof ApiStripeWebhookRoute
+  '/checkout/$slug': typeof CheckoutSlugRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
+  '/hunts/$slug': typeof HuntsSlugRoute
+  '/play/$token': typeof PlayTokenRoute
+  '/admin/': typeof AdminIndexRoute
+  '/staff/close/$token': typeof StaffCloseTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about'
     | '/admin'
+    | '/about'
     | '/artists'
     | '/contact'
     | '/hunts'
     | '/reviews'
     | '/your-hunt'
+    | '/api/stripe-webhook'
+    | '/checkout/$slug'
+    | '/checkout/success'
+    | '/hunts/$slug'
+    | '/play/$token'
+    | '/admin/'
+    | '/staff/close/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
-    | '/admin'
     | '/artists'
     | '/contact'
     | '/hunts'
     | '/reviews'
     | '/your-hunt'
+    | '/api/stripe-webhook'
+    | '/checkout/$slug'
+    | '/checkout/success'
+    | '/hunts/$slug'
+    | '/play/$token'
+    | '/admin'
+    | '/staff/close/$token'
   id:
     | '__root__'
     | '/'
-    | '/about'
     | '/admin'
+    | '/about'
     | '/artists'
     | '/contact'
     | '/hunts'
     | '/reviews'
     | '/your-hunt'
+    | '/api/stripe-webhook'
+    | '/checkout/$slug'
+    | '/checkout/success'
+    | '/hunts/$slug'
+    | '/play/$token'
+    | '/admin/'
+    | '/staff/close/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
-  AdminRoute: typeof AdminRoute
   ArtistsRoute: typeof ArtistsRoute
   ContactRoute: typeof ContactRoute
-  HuntsRoute: typeof HuntsRoute
+  HuntsRoute: typeof HuntsRouteWithChildren
   ReviewsRoute: typeof ReviewsRoute
   YourHuntRoute: typeof YourHuntRoute
+  ApiStripeWebhookRoute: typeof ApiStripeWebhookRoute
+  CheckoutSlugRoute: typeof CheckoutSlugRoute
+  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
+  PlayTokenRoute: typeof PlayTokenRoute
+  StaffCloseTokenRoute: typeof StaffCloseTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -171,18 +258,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArtistsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/about': {
       id: '/about'
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -192,18 +279,94 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/play/$token': {
+      id: '/play/$token'
+      path: '/play/$token'
+      fullPath: '/play/$token'
+      preLoaderRoute: typeof PlayTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hunts/$slug': {
+      id: '/hunts/$slug'
+      path: '/$slug'
+      fullPath: '/hunts/$slug'
+      preLoaderRoute: typeof HuntsSlugRouteImport
+      parentRoute: typeof HuntsRoute
+    }
+    '/checkout/success': {
+      id: '/checkout/success'
+      path: '/checkout/success'
+      fullPath: '/checkout/success'
+      preLoaderRoute: typeof CheckoutSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout/$slug': {
+      id: '/checkout/$slug'
+      path: '/checkout/$slug'
+      fullPath: '/checkout/$slug'
+      preLoaderRoute: typeof CheckoutSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/stripe-webhook': {
+      id: '/api/stripe-webhook'
+      path: '/api/stripe-webhook'
+      fullPath: '/api/stripe-webhook'
+      preLoaderRoute: typeof ApiStripeWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff/close/$token': {
+      id: '/staff/close/$token'
+      path: '/staff/close/$token'
+      fullPath: '/staff/close/$token'
+      preLoaderRoute: typeof StaffCloseTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AdminRouteRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
+interface HuntsRouteChildren {
+  HuntsSlugRoute: typeof HuntsSlugRoute
+}
+
+const HuntsRouteChildren: HuntsRouteChildren = {
+  HuntsSlugRoute: HuntsSlugRoute,
+}
+
+const HuntsRouteWithChildren = HuntsRoute._addFileChildren(HuntsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   AboutRoute: AboutRoute,
-  AdminRoute: AdminRoute,
   ArtistsRoute: ArtistsRoute,
   ContactRoute: ContactRoute,
-  HuntsRoute: HuntsRoute,
+  HuntsRoute: HuntsRouteWithChildren,
   ReviewsRoute: ReviewsRoute,
   YourHuntRoute: YourHuntRoute,
+  ApiStripeWebhookRoute: ApiStripeWebhookRoute,
+  CheckoutSlugRoute: CheckoutSlugRoute,
+  CheckoutSuccessRoute: CheckoutSuccessRoute,
+  PlayTokenRoute: PlayTokenRoute,
+  StaffCloseTokenRoute: StaffCloseTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

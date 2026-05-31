@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -11,9 +12,8 @@ import {
 import appCss from "../styles.css?url";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
-import { CursorGlow } from "@/components/site/CursorGlow";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
-import { StickyCompass } from "@/components/site/StickyCompass";
+import { CursorGlow } from "@/components/site/CursorGlow";
 
 function NotFoundComponent() {
   return (
@@ -85,16 +85,32 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const hideChrome = useRouterState({
+    select: (s) => {
+      const p = s.location.pathname;
+      if (p.startsWith("/admin") || p.startsWith("/staff")) return true;
+      if (p.startsWith("/play/") && s.location.hash === "complete") return true;
+      return false;
+    },
+  });
+
   return (
     <QueryClientProvider client={queryClient}>
-      <ScrollProgress />
-      <CursorGlow />
-      <StickyCompass />
-      <Header />
-      <main className="pt-28 relative z-10">
+      {hideChrome ? (
         <Outlet />
-      </main>
-      <Footer />
+      ) : (
+        <>
+          <CursorGlow />
+          <ScrollProgress />
+          <Header />
+          <main className="relative z-10 pt-28 isolate">
+            <Outlet />
+          </main>
+          <div className="relative z-10">
+            <Footer />
+          </div>
+        </>
+      )}
     </QueryClientProvider>
   );
 }

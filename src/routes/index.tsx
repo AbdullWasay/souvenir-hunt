@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, useScroll, useTransform, AnimatePresence } from "motion/react";
-import { useRef, useState } from "react";
-import { ArrowRight, Play, MapPin, Compass, Sparkles, Quote, Key, Footprints, ChevronLeft, ChevronRight, Star, Send } from "lucide-react";
+import { motion, useInView, useScroll, useTransform } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowRight, Play, MapPin, Compass, Sparkles, Quote, Key, Footprints, Star, Send, Milestone, Gift, Brain } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { Marquee } from "@/components/site/Marquee";
-import { SpotlightRow } from "@/components/site/SpotlightRow";
+import { HomeHuntsSection } from "@/components/site/HomeHuntsSection";
+import { CompassRose } from "@/components/site/CompassRose";
+import { listPublicHunts } from "@/server/hunts";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -13,16 +15,19 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "A clean self-guided city hunt with hidden stories, playful clues, and a keepsake at the end." },
     ],
   }),
+  loader: () => listPublicHunts(),
   component: Home,
 });
 
 function Home() {
+  const hunts = Route.useLoaderData();
   return (
     <>
       <Hero />
       <Marquee />
       <About />
       <Artists />
+      <HomeHuntsSection hunts={hunts} />
       <Reviews />
       <ContactForm />
       <ContactCTA />
@@ -34,28 +39,46 @@ function Hero() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const yMap = useTransform(scrollYProgress, [0, 1], [0, 180]);
-  const yBlob = useTransform(scrollYProgress, [0, 1], [0, -120]);
   const yTitle = useTransform(scrollYProgress, [0, 1], [0, 80]);
+  const yPhoto = useTransform(scrollYProgress, [0, 1], [0, -50]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
-    <section ref={ref} className="relative overflow-hidden bg-soft">
-      {/* Animated background blobs */}
-      <motion.div aria-hidden style={{ y: yBlob }} className="absolute inset-0 pointer-events-none">
-        <div className="absolute -top-32 -left-32 w-[480px] h-[480px] rounded-full bg-blue-300/40 blur-3xl animate-blob" />
-        <div className="absolute top-40 -right-40 w-[520px] h-[520px] rounded-full bg-blue-500/30 blur-3xl animate-blob" style={{ animationDelay: "-4s" }} />
-        <div className="absolute bottom-0 left-1/3 w-[420px] h-[420px] rounded-full bg-blue-100 blur-3xl animate-blob" style={{ animationDelay: "-8s" }} />
+    <section ref={ref} className="relative overflow-hidden -mt-28 pt-36">
+      <motion.div aria-hidden style={{ y: yPhoto }} className="absolute inset-0 pointer-events-none">
+        <img
+          src="/assets/branding/hero-bg.jpg"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover object-left-center opacity-50"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-white/78 via-white/58 to-blue-100/40" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,rgba(10,77,255,0.16),transparent_45%),radial-gradient(circle_at_84%_14%,rgba(47,109,255,0.22),transparent_44%)]" />
       </motion.div>
-      <div className="absolute inset-0 grid-bg pointer-events-none" />
+
+      {/* Hero compass — in-section so it isn’t hidden behind main’s opaque background */}
+      <motion.div
+        aria-hidden
+        style={{ opacity }}
+        className="absolute right-[-4%] top-36 z-[2] hidden md:block w-[min(52vw,460px)] h-[min(52vw,460px)] text-primary/80 [filter:drop-shadow(0_0_10px_rgba(10,77,255,0.28))] pointer-events-none"
+      >
+        <CompassRose
+          scrollYProgress={scrollYProgress}
+          rotateRange={[0, 220]}
+          spinDuration={200}
+          counterSpin={false}
+          gentle
+          className="w-full h-full"
+        />
+      </motion.div>
 
       {/* Floating mystery glyphs */}
-      <motion.div aria-hidden style={{ y: yMap, opacity }} className="absolute inset-0 pointer-events-none">
+      <motion.div aria-hidden style={{ y: yMap, opacity }} className="absolute inset-0 pointer-events-none z-[1]">
         <Key className="absolute top-[18%] right-[14%] w-6 h-6 text-primary/30 float-slow" />
         <Footprints className="absolute bottom-[22%] left-[8%] w-7 h-7 text-primary/25 float-slow" style={{ animationDelay: "-3s" }} />
         <Compass className="absolute top-[55%] right-[30%] w-5 h-5 text-accent/30 spin-slow" />
       </motion.div>
 
-      <div className="max-w-7xl mx-auto px-6 pt-12 pb-32 relative">
+      <div className="max-w-7xl mx-auto px-6 pt-2 pb-32 relative z-10">
 
 
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
@@ -63,7 +86,7 @@ function Hero() {
           <Sparkles className="w-3 h-3" /> Made by local artists
         </motion.div>
 
-        <motion.h1 style={{ y: yTitle }} className="font-display text-[clamp(3rem,9vw,8.5rem)] leading-[0.92] tracking-[-0.04em] text-foreground max-w-5xl text-balance">
+        <motion.h1 style={{ y: yTitle }} className="font-display text-[clamp(2.25rem,6vw,4.75rem)] leading-[1.02] tracking-[-0.03em] text-foreground max-w-4xl text-balance">
           {["Explore", "the city.", "Solve clues.", "Keep the story."].map((line, i) => (
             <motion.span
               key={line}
@@ -81,7 +104,7 @@ function Hero() {
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9, duration: 0.8 }}
           className="mt-12 max-w-3xl"
         >
-          <p className="text-lg text-foreground/80 leading-relaxed max-w-md">
+          <p className="text-base md:text-lg text-foreground/80 leading-relaxed max-w-md">
             A clean, self-guided city hunt with hidden stories, playful clues, and a keepsake at the end.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-10">
@@ -105,21 +128,23 @@ function Hero() {
           className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-px bg-border rounded-2xl overflow-hidden border border-border shadow-paper"
         >
           {[
-            { k: "04", v: "Countries", icon: MapPin },
-            { k: "07", v: "Cities mapped", icon: Compass },
-            { k: "01", v: "Live hunt", icon: Sparkles },
-            { k: "∞", v: "Stories hidden", icon: Quote },
-          ].map(({ k, v, icon: Icon }) => (
+            { value: 4, suffix: "", label: "Countries", icon: MapPin },
+            { value: 7, suffix: "", label: "Cities mapped", icon: Compass },
+            { value: 1, suffix: "", label: "Live hunt", icon: Sparkles },
+            { value: 99, suffix: "+", label: "Stories hidden", icon: Quote },
+          ].map(({ value, suffix, label, icon: Icon }) => (
             <motion.div
-              key={v}
+              key={label}
               whileHover={{ y: -4 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
               className="bg-card p-6 group hover:bg-blue-50 transition-colors relative overflow-hidden"
             >
               <div className="absolute -right-6 -top-6 w-20 h-20 rounded-full bg-blue-100 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
               <Icon className="w-4 h-4 text-primary mb-4 relative" />
-              <p className="font-display text-5xl text-foreground relative">{k}</p>
-              <p className="text-sm text-muted-foreground mt-1 relative">{v}</p>
+              <p className="font-display text-3xl md:text-4xl text-foreground relative">
+                <KpiCounter target={value} suffix={suffix} />
+              </p>
+              <p className="text-sm text-muted-foreground mt-1 relative">{label}</p>
               <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-hero-gradient group-hover:w-full transition-all duration-500" />
             </motion.div>
           ))}
@@ -130,42 +155,155 @@ function Hero() {
   );
 }
 
+function KpiCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    const duration = 1200;
+    const stepMs = 25;
+    const totalSteps = Math.max(1, Math.floor(duration / stepMs));
+    let currentStep = 0;
+    const timer = window.setInterval(() => {
+      currentStep += 1;
+      const progress = currentStep / totalSteps;
+      const next = Math.min(target, Math.round(target * progress));
+      setValue(next);
+      if (currentStep >= totalSteps) window.clearInterval(timer);
+    }, stepMs);
+    return () => window.clearInterval(timer);
+  }, [inView, target]);
+
+  return <span ref={ref}>{value}{suffix}</span>;
+}
+
 function About() {
-  const cards = [
-    { title: "Real places, not generic routes", body: "Walk somewhere that matters instead of following another standard tour path.", num: "01" },
-    { title: "A calmer kind of puzzle", body: "The challenge is designed to feel elegant and rewarding, never noisy or random.", num: "02" },
-    { title: "A souvenir tied to the journey", body: "The final reward feels connected to the route you just completed.", num: "03" },
+  const journey = [
+    {
+      icon: Milestone,
+      title: "Walk real streets",
+      body: "Meaningful stops — courtyards, facades, details a generic tour would skip.",
+    },
+    {
+      icon: Brain,
+      title: "Solve with calm",
+      body: "Clues that feel elegant and earned, never loud trivia or random guessing.",
+    },
+    {
+      icon: Gift,
+      title: "Keep the story",
+      body: "A physical souvenir tied to the route you just completed — not a generic trinket.",
+    },
   ];
+
   return (
-    <section id="about" className="py-32 relative">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid md:grid-cols-12 gap-12 mb-20">
+    <section id="about" className="py-28 md:py-36 relative scroll-mt-32 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-50/80 via-background to-background pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[min(50vw,520px)] h-[min(50vw,520px)] rounded-full bg-primary/8 blur-3xl pointer-events-none" />
+
+      <div className="relative max-w-7xl mx-auto px-6">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          <Reveal className="lg:col-span-5 lg:sticky lg:top-36">
+            <p className="font-mono text-xs tracking-[0.3em] uppercase text-primary">About</p>
+            <h2 className="mt-5 font-display text-[clamp(2rem,4.5vw,3.5rem)] leading-[1.02] text-ink text-balance">
+              Sightseeing made <em className="italic font-light text-primary">worth remembering.</em>
+            </h2>
+            <p className="mt-6 text-foreground/75 leading-relaxed">
+              Souvenir Hunt turns real streets into story-led experiences — discovered, not consumed.
+            </p>
+            <blockquote className="mt-10 border-l-2 border-primary/40 pl-6">
+              <p className="font-display text-xl text-ink/90 italic leading-snug">
+                &ldquo;The city should feel like a mystery you&apos;re invited into — not a checklist.&rdquo;
+              </p>
+            </blockquote>
+          </Reveal>
+
+          <div className="lg:col-span-7 space-y-0">
+            {journey.map((step, i) => (
+              <Reveal key={step.title} delay={i * 0.08}>
+                <motion.div
+                  initial={{ opacity: 0, x: 36 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ amount: 0.35 }}
+                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: i * 0.05 }}
+                  className="relative flex gap-6 md:gap-8 pb-12 last:pb-0 group"
+                >
+                  {i < journey.length - 1 && (
+                    <span className="absolute left-[23px] md:left-[27px] top-14 bottom-0 w-px bg-gradient-to-b from-primary/40 to-transparent" />
+                  )}
+                  <span className="relative z-10 grid place-items-center w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-2xl bg-primary text-white shadow-paper group-hover:scale-105 transition-transform">
+                    <step.icon className="w-5 h-5 md:w-6 md:h-6" strokeWidth={1.5} />
+                  </span>
+                  <article className="flex-1 pt-1 pb-2">
+                    <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-muted-foreground">
+                      Step 0{i + 1}
+                    </span>
+                    <h3 className="mt-2 font-display text-2xl md:text-3xl text-ink">{step.title}</h3>
+                    <p className="mt-3 text-foreground/70 leading-relaxed max-w-lg">{step.body}</p>
+                  </article>
+                </motion.div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Artists() {
+  const skills = [
+    { label: "Storytelling", body: "Narratives rooted in place — written with locals, never generic tour copy." },
+    { label: "Puzzle design", body: "Clues paced to feel polished, intuitive, and satisfying to solve on foot." },
+    { label: "Souvenir craft", body: "A physical ending designed with the route — local, memorable, and earned." },
+  ];
+
+  return (
+    <section id="artists" className="py-28 md:py-32 bg-ink text-parchment relative overflow-hidden scroll-mt-32">
+      <div className="absolute inset-0 opacity-[0.06] pointer-events-none">
+        <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <pattern id="home-artists-grid" width="6" height="6" patternUnits="userSpaceOnUse">
+              <path d="M 6 0 L 0 0 0 6" fill="none" stroke="currentColor" strokeWidth="0.2" />
+            </pattern>
+          </defs>
+          <rect width="100" height="100" fill="url(#home-artists-grid)" />
+        </svg>
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-6">
+        <div className="grid md:grid-cols-12 gap-12 mb-16">
           <Reveal className="md:col-span-4">
-            <p className="font-mono text-xs tracking-[0.3em] uppercase text-accent">About — 01</p>
+            <p className="font-mono text-xs tracking-[0.3em] uppercase text-amber-seal">Artists &amp; Makers</p>
           </Reveal>
           <Reveal className="md:col-span-8" delay={0.1}>
-            <h2 className="font-display text-[clamp(2.5rem,5vw,5rem)] leading-[1] text-ink text-balance">
-              Sightseeing made <em className="italic font-light">worth remembering.</em>
+            <h2 className="font-display text-[clamp(1.75rem,4vw,3.25rem)] leading-[1.05] text-balance">
+              Built with local artists, storytellers, and{" "}
+              <em className="italic font-light text-amber-seal">game makers.</em>
             </h2>
-            <p className="mt-8 text-lg text-foreground/75 max-w-2xl">
-              Souvenir Hunt turns real streets into story-led city experiences. We guide you through meaningful locations, hidden details, and memorable clues so the city feels discovered rather than consumed. At the end, you leave with something physical and worth keeping.
+            <p className="mt-6 text-lg text-parchment/75 max-w-2xl">
+              Each hunt is shaped by people who know how to turn a city into something cultural, playful, and worth remembering.
             </p>
           </Reveal>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {cards.map((c, i) => (
-            <Reveal key={c.num} delay={i * 0.1}>
-              <article className="paper-card grain rounded-3xl p-8 h-full flex flex-col group hover:-translate-y-1 transition-transform duration-500">
-                <div className="flex items-start justify-between mb-12">
-                  <span className="font-mono text-xs tracking-widest text-muted-foreground">{c.num} / 03</span>
-                  <span className="w-10 h-10 rounded-full border border-border grid place-items-center text-ink group-hover:bg-ink group-hover:text-parchment transition-colors">
-                    <ArrowRight className="w-4 h-4 -rotate-45" />
-                  </span>
-                </div>
-                <h3 className="font-display text-2xl text-ink leading-tight mb-4">{c.title}</h3>
-                <p className="text-foreground/70 leading-relaxed">{c.body}</p>
-              </article>
+        <div className="space-y-px bg-parchment/10 rounded-3xl overflow-hidden border border-parchment/10">
+          {skills.map((s, i) => (
+            <Reveal key={s.label} delay={i * 0.08}>
+              <motion.div
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ amount: 0.35 }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: i * 0.07 }}
+                whileHover={{ x: 6 }}
+                className="grid md:grid-cols-12 items-center bg-ink px-6 md:px-10 py-10 md:py-12 group hover:bg-ink/80 transition-colors"
+              >
+                <span className="md:col-span-1 font-mono text-xs text-amber-seal">0{i + 1}</span>
+                <h3 className="md:col-span-4 font-display text-2xl md:text-4xl mt-2 md:mt-0">{s.label}</h3>
+                <p className="md:col-span-7 mt-3 md:mt-0 text-parchment/70 text-base md:text-lg leading-relaxed">{s.body}</p>
+              </motion.div>
             </Reveal>
           ))}
         </div>
@@ -174,289 +312,110 @@ function About() {
   );
 }
 
-function Artists() {
-  const crafts = [
-    {
-      label: "Storytelling",
-      body: "Narratives that feel rooted in place rather than copied from a template.",
-      meta: "Writers · Historians · Locals",
-      glyph: (
-        <svg viewBox="0 0 64 64" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.2">
-          <path d="M10 14 L32 8 L54 14 L54 54 L32 48 L10 54 Z" />
-          <path d="M32 8 L32 48" />
-          <path d="M16 22 L26 24 M16 30 L26 32 M16 38 L26 40" strokeLinecap="round" />
-          <path d="M38 22 L48 20 M38 30 L48 28 M38 38 L48 36" strokeLinecap="round" />
-        </svg>
-      ),
-    },
-    {
-      label: "Puzzle design",
-      body: "Clues paced to feel polished, intuitive, and satisfying to solve.",
-      meta: "Game designers · Cryptics · Testers",
-      glyph: (
-        <svg viewBox="0 0 64 64" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.2">
-          <path d="M8 12 H28 V24 a6 6 0 0 0 12 0 V12 H56 V32 a6 6 0 0 1 0 12 V56 H40 V44 a6 6 0 0 1 -12 0 V56 H8 a6 6 0 0 1 0 -12 V32 a6 6 0 0 0 0 -20 Z" />
-          <circle cx="32" cy="32" r="2.5" fill="currentColor" />
-        </svg>
-      ),
-    },
-    {
-      label: "Souvenir craft",
-      body: "A physical ending that feels local, memorable, and earned.",
-      meta: "Makers · Printers · Ceramicists",
-      glyph: (
-        <svg viewBox="0 0 64 64" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.2">
-          <circle cx="32" cy="28" r="18" />
-          <circle cx="32" cy="28" r="11" />
-          <path d="M32 10 L32 4 M14 28 L8 28 M50 28 L56 28 M32 46 L32 52" strokeLinecap="round" />
-          <path d="M24 50 L20 60 L32 56 L44 60 L40 50" />
-        </svg>
-      ),
-    },
-  ];
-
-  const [active, setActive] = useState(0);
-
-  return (
-    <section className="py-32 bg-ink text-parchment relative overflow-hidden">
-      <div aria-hidden className="absolute inset-0 opacity-[0.08] pointer-events-none">
-        <svg className="w-full h-full" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
-          {Array.from({ length: 14 }).map((_, i) => (
-            <path
-              key={i}
-              d={`M0 ${80 + i * 38} Q200 ${40 + i * 38} 400 ${100 + i * 38} T800 ${70 + i * 38}`}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="0.6"
-            />
-          ))}
-        </svg>
-      </div>
-      <motion.div
-        aria-hidden
-        className="absolute -top-32 -left-32 w-[40rem] h-[40rem] rounded-full blur-3xl pointer-events-none"
-        style={{ background: "radial-gradient(circle, oklch(0.58 0.2 250 / 0.35), transparent 70%)" }}
-        animate={{ x: [0, 60, 0], y: [0, 40, 0] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      <div className="max-w-7xl mx-auto px-6 relative">
-        <div className="grid md:grid-cols-12 gap-12 mb-20">
-          <Reveal className="md:col-span-4">
-            <p className="font-mono text-xs tracking-[0.3em] uppercase text-blue-300">Artists &amp; Makers — 02</p>
-          </Reveal>
-          <Reveal className="md:col-span-8" delay={0.1}>
-            <h2 className="font-display text-[clamp(2.5rem,5vw,5rem)] leading-[1] text-balance">
-              Built with local artists, storytellers, and{" "}
-              <em className="italic font-light text-gradient animate-gradient">game makers.</em>
-            </h2>
-            <p className="mt-8 text-lg text-parchment/70 max-w-2xl">
-              Each hunt is shaped by people who know how to turn a city into something cultural, playful, and worth remembering.
-            </p>
-          </Reveal>
-        </div>
-
-        <div className="grid lg:grid-cols-12 gap-8 items-start">
-          <div className="lg:col-span-7 space-y-3">
-            {crafts.map((c, i) => {
-              const isActive = active === i;
-              return (
-                <motion.button
-                  key={c.label}
-                  onMouseEnter={() => setActive(i)}
-                  onFocus={() => setActive(i)}
-                  onClick={() => setActive(i)}
-                  className={`relative w-full text-left rounded-2xl border overflow-hidden transition-colors duration-500 ${
-                    isActive
-                      ? "border-blue-300/50 bg-gradient-to-r from-blue-500/15 via-blue-700/10 to-transparent"
-                      : "border-parchment/10 bg-parchment/[0.02] hover:border-parchment/25"
-                  }`}
-                  initial={false}
-                  animate={{ paddingTop: isActive ? 28 : 20, paddingBottom: isActive ? 28 : 20 }}
-                >
-                  <motion.span
-                    aria-hidden
-                    className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-blue-300 to-blue-600"
-                    initial={false}
-                    animate={{ scaleY: isActive ? 1 : 0.15, opacity: isActive ? 1 : 0.4 }}
-                    style={{ transformOrigin: "top" }}
-                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  />
-                  <div className="grid grid-cols-[auto_1fr_auto] items-center gap-6 px-6 md:px-10">
-                    <span className={`font-mono text-xs tracking-widest ${isActive ? "text-blue-300" : "text-parchment/40"}`}>
-                      / 0{i + 1}
-                    </span>
-                    <div>
-                      <h3 className="font-display text-2xl md:text-3xl">{c.label}</h3>
-                      <AnimatePresence initial={false}>
-                        {isActive && (
-                          <motion.div
-                            key="exp"
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                            className="overflow-hidden"
-                          >
-                            <p className="mt-3 text-parchment/75 max-w-xl">{c.body}</p>
-                            <p className="mt-3 font-mono text-[11px] tracking-[0.2em] uppercase text-parchment/40">{c.meta}</p>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                    <motion.div
-                      animate={{ rotate: isActive ? 45 : 0, scale: isActive ? 1.1 : 1 }}
-                      transition={{ duration: 0.4 }}
-                      className={`w-10 h-10 rounded-full grid place-items-center border ${isActive ? "border-blue-300 text-blue-300" : "border-parchment/20 text-parchment/40"}`}
-                    >
-                      <ArrowRight className="w-4 h-4" />
-                    </motion.div>
-                  </div>
-                </motion.button>
-              );
-            })}
-          </div>
-
-          <div className="lg:col-span-5 lg:sticky lg:top-32">
-            <div className="relative aspect-[4/5] rounded-3xl border border-parchment/15 overflow-hidden bg-gradient-to-br from-blue-900/40 via-ink to-ink">
-              <div
-                className="absolute inset-0 opacity-30"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(oklch(0.78 0.12 245 / 0.15) 1px, transparent 1px), linear-gradient(90deg, oklch(0.78 0.12 245 / 0.15) 1px, transparent 1px)",
-                  backgroundSize: "32px 32px",
-                }}
-              />
-              <motion.div
-                aria-hidden
-                className="absolute inset-8 rounded-full border border-dashed border-blue-300/30"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-              />
-              <motion.div
-                aria-hidden
-                className="absolute inset-20 rounded-full border border-blue-300/20"
-                animate={{ rotate: -360 }}
-                transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-              />
-
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={active}
-                  initial={{ opacity: 0, scale: 0.9, rotate: -8 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  exit={{ opacity: 0, scale: 1.05, rotate: 6 }}
-                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  className="absolute inset-0 grid place-items-center text-blue-300"
-                >
-                  <div className="w-1/2 h-1/2">{crafts[active].glyph}</div>
-                </motion.div>
-              </AnimatePresence>
-
-              <div className="absolute bottom-0 inset-x-0 p-6 flex items-end justify-between border-t border-parchment/10 bg-ink/40 backdrop-blur-sm">
-                <div>
-                  <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-parchment/40">Now showing</p>
-                  <AnimatePresence mode="wait">
-                    <motion.p
-                      key={active}
-                      initial={{ y: 10, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -10, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="font-display text-xl mt-1"
-                    >
-                      {crafts[active].label}
-                    </motion.p>
-                  </AnimatePresence>
-                </div>
-                <span className="font-mono text-xs text-blue-300">0{active + 1} / 0{crafts.length}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function Reviews() {
-  const reviews = [
-    { quote: "It felt like exploring Split inside a mystery novel. Clean, easy, and actually memorable.", name: "Mia & Luka", role: "Weekend travelers", city: "Zagreb" },
+  const featured = {
+    quote: "It felt like exploring Split inside a mystery novel. Clean, easy, and actually memorable.",
+    name: "Mia & Luka",
+    role: "Weekend travelers",
+    city: "Split",
+  };
+  const more = [
     { quote: "Way better than a normal walking tour. The souvenir at the end made it feel earned.", name: "Sophie", role: "Solo traveler", city: "Paris" },
     { quote: "Simple on mobile, fun to solve, and polished enough to feel premium.", name: "Daniel + friends", role: "Group of 4", city: "London" },
-    { quote: "We spent three hours wandering with grins on our faces. Genuine discovery.", name: "Ana", role: "Local guide", city: "Split" },
   ];
-  const [i, setI] = useState(0);
-  const go = (dir: number) => setI((p) => (p + dir + reviews.length) % reviews.length);
-  const r = reviews[i];
+
   return (
-    <section className="py-32 relative">
+    <section id="reviews" className="py-28 md:py-36 relative scroll-mt-32">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid md:grid-cols-12 gap-12 mb-16">
-          <Reveal className="md:col-span-4">
-            <p className="font-mono text-xs tracking-[0.3em] uppercase text-accent">Reviews — 03</p>
-          </Reveal>
-          <Reveal className="md:col-span-8" delay={0.1}>
-            <h2 className="font-display text-[clamp(2.5rem,5vw,5rem)] leading-[1] text-ink text-balance">
-              People remember the <em className="italic font-light">story</em>, not just the route.
-            </h2>
-          </Reveal>
-        </div>
-
-        <Reveal>
-          <div className="relative paper-card rounded-[2rem] p-8 md:p-16 overflow-hidden">
-            <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-blue-200/50 blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-blue-100/60 blur-3xl pointer-events-none" />
-            <Quote className="w-14 h-14 text-accent/40 mb-8 relative" strokeWidth={1} />
-            <div className="relative min-h-[220px] md:min-h-[180px]">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, y: -20, filter: "blur(8px)" }}
-                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <p className="font-display text-2xl md:text-4xl leading-snug text-ink text-balance">
-                    "{r.quote}"
-                  </p>
-                  <div className="mt-10 flex flex-wrap items-end justify-between gap-6">
-                    <div>
-                      <div className="flex gap-1 text-accent mb-3">
-                        {Array.from({ length: 5 }).map((_, j) => (
-                          <Star key={j} className="w-4 h-4" fill="currentColor" />
-                        ))}
-                      </div>
-                      <p className="font-medium text-ink">{r.name}</p>
-                      <p className="text-sm text-muted-foreground">{r.role} · {r.city}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            <div className="mt-12 flex items-center justify-between relative">
-              <div className="flex gap-2">
-                {reviews.map((_, j) => (
-                  <button
-                    key={j}
-                    onClick={() => setI(j)}
-                    aria-label={`Review ${j + 1}`}
-                    className={`h-1.5 rounded-full transition-all ${j === i ? "w-10 bg-primary" : "w-4 bg-border hover:bg-primary/40"}`}
-                  />
-                ))}
-              </div>
-              <div className="flex gap-3">
-                <button onClick={() => go(-1)} aria-label="Previous" className="w-12 h-12 rounded-full border border-border hover:border-primary hover:text-primary text-ink grid place-items-center transition-colors">
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-                <button onClick={() => go(1)} aria-label="Next" className="w-12 h-12 rounded-full bg-primary text-white grid place-items-center hover:shadow-glow transition-shadow">
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
+        <Reveal className="text-center max-w-2xl mx-auto mb-14">
+          <p className="font-mono text-xs tracking-[0.3em] uppercase text-amber-seal">Reviews</p>
+          <h2 className="mt-4 font-display text-[clamp(1.75rem,4vw,3.25rem)] leading-[1.08] text-ink text-balance">
+            Voices from the <em className="italic font-light">trail.</em>
+          </h2>
         </Reveal>
+
+        <div className="grid lg:grid-cols-12 gap-5 md:gap-6">
+          <Reveal className="lg:col-span-7">
+            <motion.article
+              initial={{ opacity: 0, y: 28, scale: 0.98 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ amount: 0.25 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -4 }}
+              className="relative h-full min-h-[320px] rounded-[2rem] overflow-hidden bg-ink text-parchment p-8 md:p-12 flex flex-col justify-between"
+            >
+              <div className="absolute inset-0 opacity-40" style={{ backgroundImage: "radial-gradient(circle at 20% 0%, oklch(0.55 0.2 45 / 0.5), transparent 55%), radial-gradient(circle at 90% 100%, oklch(0.45 0.15 250 / 0.4), transparent 50%)" }} />
+              <div className="relative">
+                <div className="flex gap-1 text-amber-seal mb-8">
+                  {Array.from({ length: 5 }).map((_, j) => (
+                    <Star key={j} className="w-4 h-4" fill="currentColor" />
+                  ))}
+                </div>
+                <Quote className="w-12 h-12 text-parchment/30 mb-6" strokeWidth={1} />
+                <p className="font-display text-[clamp(1.5rem,3vw,2.25rem)] leading-[1.15] text-balance">
+                  &ldquo;{featured.quote}&rdquo;
+                </p>
+              </div>
+              <div className="relative mt-10 flex items-end justify-between gap-4">
+                <div>
+                  <p className="font-medium text-lg">{featured.name}</p>
+                  <p className="text-sm text-parchment/60 mt-1">{featured.role}</p>
+                </div>
+                <span className="stamp bg-parchment/10 text-parchment border-parchment/20 text-xs shrink-0">
+                  <MapPin className="w-3 h-3" /> {featured.city}
+                </span>
+              </div>
+            </motion.article>
+          </Reveal>
+
+          <div className="lg:col-span-5 flex flex-col gap-5 md:gap-6">
+            {more.map((r, i) => (
+              <Reveal key={r.name} delay={0.08 + i * 0.06}>
+                <motion.article
+                  initial={{ opacity: 0, x: 24 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ amount: 0.4 }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ y: -3 }}
+                  className={`paper-card rounded-2xl p-7 flex flex-col justify-between h-full ${i === 0 ? "bg-amber-seal/8 border-amber-seal/25" : ""}`}
+                  style={i === 1 ? { transform: "rotate(0.6deg)" } : undefined}
+                >
+                  <div>
+                    <div className="flex gap-1 text-amber-seal mb-4">
+                      {Array.from({ length: 5 }).map((_, j) => (
+                        <Star key={j} className="w-3.5 h-3.5" fill="currentColor" />
+                      ))}
+                    </div>
+                    <p className="font-display text-xl leading-snug text-ink">&ldquo;{r.quote}&rdquo;</p>
+                  </div>
+                  <div className="mt-6 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="font-medium text-ink text-sm">{r.name}</p>
+                      <p className="text-xs text-muted-foreground">{r.role}</p>
+                    </div>
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{r.city}</span>
+                  </div>
+                </motion.article>
+              </Reveal>
+            ))}
+
+            <Reveal delay={0.2}>
+              <div className="rounded-2xl border border-dashed border-border px-6 py-5 flex items-center justify-between gap-4 bg-muted/30">
+                <p className="text-sm text-foreground/70">4.9 average from early explorers</p>
+                <div className="flex -space-x-2">
+                  {["M", "S", "D", "+"].map((initial) => (
+                    <span
+                      key={initial}
+                      className="w-8 h-8 rounded-full bg-primary/15 border-2 border-background grid place-items-center text-xs font-mono text-primary"
+                    >
+                      {initial}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -465,12 +424,12 @@ function Reviews() {
 function ContactForm() {
   const [sent, setSent] = useState(false);
   return (
-    <section className="py-32 relative">
+    <section id="contact" className="py-28 md:py-32 relative scroll-mt-32">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-12 gap-10 items-start">
           <Reveal className="md:col-span-5">
-            <p className="font-mono text-xs tracking-[0.3em] uppercase text-accent">Get in touch — 04</p>
-            <h2 className="mt-6 font-display text-[clamp(2.25rem,4.5vw,4rem)] leading-[1] text-ink text-balance">
+            <p className="font-mono text-xs tracking-[0.3em] uppercase text-accent">Contact</p>
+            <h2 className="mt-6 font-display text-[clamp(1.5rem,3.5vw,2.75rem)] leading-[1.08] text-ink text-balance">
               Bring a hunt to your <em className="italic font-light text-gradient animate-gradient">city.</em>
             </h2>
             <p className="mt-6 text-foreground/75 max-w-md">
@@ -550,14 +509,14 @@ function ContactCTA() {
 
             <div className="relative">
               <p className="font-mono text-xs tracking-[0.3em] uppercase text-white/60">Partner with us — 05</p>
-              <h2 className="mt-6 font-display text-[clamp(2.5rem,6vw,6rem)] leading-[0.95] text-balance max-w-4xl">
+              <h2 className="mt-6 font-display text-[clamp(1.75rem,4vw,3.5rem)] leading-[1.05] text-balance max-w-3xl">
                 Create something <em className="italic font-light text-gradient animate-gradient">worth discovering.</em>
               </h2>
               <p className="mt-8 text-lg text-white/75 max-w-xl">
                 Want to partner, create, or launch a hunt? Bring your city, your artwork, or your venue into the experience. We're building premium clue hunts shaped by local people.
               </p>
-              <Link to="/contact" className="btn-shine mt-10 inline-flex items-center gap-3 rounded-full bg-white text-[oklch(0.18_0.06_254)] px-7 py-4 text-sm font-medium hover:bg-blue-50 transition-colors">
-                Let's build something
+              <Link to="/" hash="contact" className="btn-shine mt-10 inline-flex items-center gap-3 rounded-full bg-white text-[oklch(0.18_0.06_254)] px-7 py-4 text-sm font-medium hover:bg-blue-50 transition-colors">
+                Let&apos;s build something
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
