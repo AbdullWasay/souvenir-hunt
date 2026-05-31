@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { scrollRevealBootScript } from "@/lib/scroll-reveal";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
@@ -78,7 +79,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head><HeadContent /></head>
-      <body>{children}<Scripts /></body>
+      <body>
+        {children}
+        <script dangerouslySetInnerHTML={{ __html: scrollRevealBootScript }} />
+        <Scripts />
+      </body>
     </html>
   );
 }

@@ -293,10 +293,13 @@
       animation: enter-fade 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0s) both;
     }
 
-    .scroll-reveal {
+    .scroll-reveal.scroll-reveal-ready:not(.is-visible) {
+      opacity: 0;
+      transform: translate3d(var(--reveal-x, 0), var(--reveal-y, 24px), 0);
+    }
+
+    .scroll-reveal.is-visible {
       animation: scroll-reveal-fade 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0s) both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 28%;
     }
   }
 

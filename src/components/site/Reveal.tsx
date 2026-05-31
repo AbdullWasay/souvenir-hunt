@@ -1,4 +1,5 @@
-import { createElement, type CSSProperties, type ReactNode } from "react";
+import { createElement, useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { observeScrollReveal } from "@/lib/scroll-reveal";
 
 interface RevealProps {
   children: ReactNode;
@@ -10,8 +11,15 @@ interface RevealProps {
   as?: "div" | "section" | "header" | "article" | "h1" | "h2" | "h3" | "p" | "span";
 }
 
-/** Scroll-triggered fade/slide — pure CSS (works without React hydration). */
+/** Scroll-triggered fade/slide — CSS animation toggled by IntersectionObserver. */
 export function Reveal({ children, delay = 0, y = 24, x = 0, className, style, as = "div" }: RevealProps) {
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (el) observeScrollReveal(el);
+  }, []);
+
   const revealStyle = {
     ...style,
     "--reveal-delay": `${delay}s`,
@@ -19,5 +27,5 @@ export function Reveal({ children, delay = 0, y = 24, x = 0, className, style, a
     "--reveal-x": `${x}px`,
   } as CSSProperties;
 
-  return createElement(as, { className: `scroll-reveal ${className ?? ""}`.trim(), style: revealStyle }, children);
+  return createElement(as, { ref, className: `scroll-reveal ${className ?? ""}`.trim(), style: revealStyle }, children);
 }
