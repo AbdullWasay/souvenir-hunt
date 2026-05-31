@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, useInView, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Play, MapPin, Compass, Sparkles, Quote, Key, Footprints, Star, Send, Milestone, Gift, Brain } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
@@ -44,16 +43,9 @@ function Home() {
 }
 
 function Hero() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const yMap = useTransform(scrollYProgress, [0, 1], [0, 180]);
-  const yTitle = useTransform(scrollYProgress, [0, 1], [0, 80]);
-  const yPhoto = useTransform(scrollYProgress, [0, 1], [0, -50]);
-  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
-
   return (
-    <section ref={ref} className="relative overflow-hidden -mt-28 pt-36">
-      <motion.div aria-hidden style={{ y: yPhoto }} className="absolute inset-0 pointer-events-none">
+    <section className="relative overflow-hidden -mt-28 pt-36">
+      <div aria-hidden className="absolute inset-0 pointer-events-none">
         <img
           src="/assets/branding/hero-bg.jpg"
           alt=""
@@ -61,39 +53,27 @@ function Hero() {
         />
         <div className="absolute inset-0 bg-gradient-to-br from-white/78 via-white/58 to-blue-100/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_24%,rgba(10,77,255,0.16),transparent_45%),radial-gradient(circle_at_84%_14%,rgba(47,109,255,0.22),transparent_44%)]" />
-      </motion.div>
+      </div>
 
-      {/* Hero compass — in-section so it isn’t hidden behind main’s opaque background */}
-      <motion.div
+      <div
         aria-hidden
-        style={{ opacity }}
-        className="absolute right-[-4%] top-36 z-[2] hidden md:block w-[min(52vw,460px)] h-[min(52vw,460px)] text-primary/80 [filter:drop-shadow(0_0_10px_rgba(10,77,255,0.28))] pointer-events-none"
+        className="absolute right-[-4%] top-36 z-[2] hidden md:block w-[min(52vw,460px)] h-[min(52vw,460px)] text-primary/80 [filter:drop-shadow(0_0_10px_rgba(10,77,255,0.28))] pointer-events-none spin-slow"
       >
-        <CompassRose
-          scrollYProgress={scrollYProgress}
-          rotateRange={[0, 220]}
-          spinDuration={200}
-          counterSpin={false}
-          gentle
-          className="w-full h-full"
-        />
-      </motion.div>
+        <CompassRose gentle className="w-full h-full" />
+      </div>
 
-      {/* Floating mystery glyphs */}
-      <motion.div aria-hidden style={{ y: yMap, opacity }} className="absolute inset-0 pointer-events-none z-[1]">
+      <div aria-hidden className="absolute inset-0 pointer-events-none z-[1]">
         <Key className="absolute top-[18%] right-[14%] w-6 h-6 text-primary/30 float-slow" />
         <Footprints className="absolute bottom-[22%] left-[8%] w-7 h-7 text-primary/25 float-slow" style={{ animationDelay: "-3s" }} />
         <Compass className="absolute top-[55%] right-[30%] w-5 h-5 text-accent/30 spin-slow" />
-      </motion.div>
+      </div>
 
       <div className="max-w-7xl mx-auto px-6 pt-2 pb-32 relative z-10">
-
-
         <AnimateIn y={12} className="stamp text-primary mb-10 bg-white/70 backdrop-blur">
           <Sparkles className="w-3 h-3" /> Made by local artists
         </AnimateIn>
 
-        <motion.h1 style={{ y: yTitle }} className="font-display text-[clamp(2.25rem,6vw,4.75rem)] leading-[1.02] tracking-[-0.03em] text-foreground max-w-4xl text-balance">
+        <h1 className="font-display text-[clamp(2.25rem,6vw,4.75rem)] leading-[1.02] tracking-[-0.03em] text-foreground max-w-4xl text-balance">
           {["Explore", "the city.", "Solve clues.", "Keep the story."].map((line, i) => (
             <AnimateIn
               key={line}
@@ -105,7 +85,7 @@ function Hero() {
               {i === 2 ? <span className="text-gradient animate-gradient">{line}</span> : line}
             </AnimateIn>
           ))}
-        </motion.h1>
+        </h1>
 
         <AnimateIn delay={0.9} className="mt-12 max-w-3xl">
           <p className="text-base md:text-lg text-foreground/80 leading-relaxed max-w-md">
@@ -134,11 +114,9 @@ function Hero() {
             { value: 1, suffix: "", label: "Live hunt", icon: Sparkles },
             { value: 99, suffix: "+", label: "Stories hidden", icon: Quote },
           ].map(({ value, suffix, label, icon: Icon }) => (
-            <motion.div
+            <div
               key={label}
-              whileHover={{ y: -4 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="bg-card p-6 group hover:bg-blue-50 transition-colors relative overflow-hidden"
+              className="bg-card p-6 group hover:bg-blue-50 hover:-translate-y-1 transition-all relative overflow-hidden"
             >
               <div className="absolute -right-6 -top-6 w-20 h-20 rounded-full bg-blue-100 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
               <Icon className="w-4 h-4 text-primary mb-4 relative" />
@@ -147,7 +125,7 @@ function Hero() {
               </p>
               <p className="text-sm text-muted-foreground mt-1 relative">{label}</p>
               <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-hero-gradient group-hover:w-full transition-all duration-500" />
-            </motion.div>
+            </div>
           ))}
         </AnimateIn>
 
@@ -158,24 +136,44 @@ function Hero() {
 
 function KpiCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.6 });
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(target);
 
   useEffect(() => {
-    if (!inView) return;
-    const duration = 1200;
-    const stepMs = 25;
-    const totalSteps = Math.max(1, Math.floor(duration / stepMs));
-    let currentStep = 0;
-    const timer = window.setInterval(() => {
-      currentStep += 1;
-      const progress = currentStep / totalSteps;
-      const next = Math.min(target, Math.round(target * progress));
-      setValue(next);
-      if (currentStep >= totalSteps) window.clearInterval(timer);
-    }, stepMs);
-    return () => window.clearInterval(timer);
-  }, [inView, target]);
+    const el = ref.current;
+    if (!el) return;
+
+    const run = () => {
+      const duration = 1200;
+      const stepMs = 25;
+      const totalSteps = Math.max(1, Math.floor(duration / stepMs));
+      let currentStep = 0;
+      const timer = window.setInterval(() => {
+        currentStep += 1;
+        const progress = currentStep / totalSteps;
+        setValue(Math.min(target, Math.round(target * progress)));
+        if (currentStep >= totalSteps) window.clearInterval(timer);
+      }, stepMs);
+    };
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setValue(target);
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setValue(0);
+          run();
+          io.disconnect();
+        }
+      },
+      { threshold: 0.4 },
+    );
+
+    io.observe(el);
+    return () => io.disconnect();
+  }, [target]);
 
   return <span ref={ref}>{value}{suffix}</span>;
 }
@@ -223,9 +221,8 @@ function About() {
 
           <div className="lg:col-span-7 space-y-0">
             {journey.map((step, i) => (
-              <AnimateIn
+              <Reveal
                 key={step.title}
-                trigger="inView"
                 x={36}
                 delay={i * 0.05}
                 className="relative flex gap-6 md:gap-8 pb-12 last:pb-0 group"
@@ -243,7 +240,7 @@ function About() {
                   <h3 className="mt-2 font-display text-2xl md:text-3xl text-ink">{step.title}</h3>
                   <p className="mt-3 text-foreground/70 leading-relaxed max-w-lg">{step.body}</p>
                 </article>
-              </AnimateIn>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -290,9 +287,8 @@ function Artists() {
 
         <div className="space-y-px bg-parchment/10 rounded-3xl overflow-hidden border border-parchment/10">
           {skills.map((s, i) => (
-            <AnimateIn
+            <Reveal
               key={s.label}
-              trigger="inView"
               y={28}
               delay={i * 0.07}
               className="grid md:grid-cols-12 items-center bg-ink px-6 md:px-10 py-10 md:py-12 group hover:bg-ink/80 transition-colors"
@@ -300,7 +296,7 @@ function Artists() {
               <span className="md:col-span-1 font-mono text-xs text-amber-seal">0{i + 1}</span>
               <h3 className="md:col-span-4 font-display text-2xl md:text-4xl mt-2 md:mt-0">{s.label}</h3>
               <p className="md:col-span-7 mt-3 md:mt-0 text-parchment/70 text-base md:text-lg leading-relaxed">{s.body}</p>
-            </AnimateIn>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -331,11 +327,9 @@ function Reviews() {
         </Reveal>
 
         <div className="grid lg:grid-cols-12 gap-5 md:gap-6">
-          <AnimateIn
+          <Reveal
             as="article"
-            trigger="inView"
             y={28}
-            scale={0.98}
             className="lg:col-span-7 relative h-full min-h-[320px] rounded-[2rem] overflow-hidden bg-ink text-parchment p-8 md:p-12 flex flex-col justify-between"
           >
               <div className="absolute inset-0 opacity-40" style={{ backgroundImage: "radial-gradient(circle at 20% 0%, oklch(0.55 0.2 45 / 0.5), transparent 55%), radial-gradient(circle at 90% 100%, oklch(0.45 0.15 250 / 0.4), transparent 50%)" }} />
@@ -359,14 +353,13 @@ function Reviews() {
                   <MapPin className="w-3 h-3" /> {featured.city}
                 </span>
               </div>
-          </AnimateIn>
+          </Reveal>
 
           <div className="lg:col-span-5 flex flex-col gap-5 md:gap-6">
             {more.map((r, i) => (
-              <AnimateIn
+              <Reveal
                 key={r.name}
                 as="article"
-                trigger="inView"
                 x={24}
                 delay={i * 0.06}
                 className={`paper-card rounded-2xl p-7 flex flex-col justify-between h-full ${i === 0 ? "bg-amber-seal/8 border-amber-seal/25" : ""}`}
@@ -387,7 +380,7 @@ function Reviews() {
                     </div>
                     <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{r.city}</span>
                   </div>
-              </AnimateIn>
+              </Reveal>
             ))}
 
             <Reveal delay={0.2}>
@@ -490,13 +483,10 @@ function ContactCTA() {
             {/* mesh + grid */}
             <div className="absolute inset-0 opacity-60" style={{ backgroundImage: "radial-gradient(at 20% 20%, oklch(0.5 0.22 252 / 0.5), transparent 50%), radial-gradient(at 80% 80%, oklch(0.58 0.2 250 / 0.35), transparent 55%)" }} />
             <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)", backgroundSize: "44px 44px" }} />
-            <motion.div aria-hidden
-              animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-              className="absolute -right-24 -top-24 w-[420px] h-[420px] rounded-full border border-white/10"
-            >
+            <div aria-hidden className="absolute -right-24 -top-24 w-[420px] h-[420px] rounded-full border border-white/10 spin-slow">
               <div className="absolute inset-8 rounded-full border border-white/10" />
               <div className="absolute inset-20 rounded-full border border-white/10" />
-            </motion.div>
+            </div>
 
             <div className="relative">
               <p className="font-mono text-xs tracking-[0.3em] uppercase text-white/60">Partner with us — 05</p>

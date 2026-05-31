@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "motion/react";
 import { Search, ChevronDown, Clock, Users, MapPin, Sparkles, ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { listPublicHunts } from "@/server/hunts";
@@ -222,13 +221,7 @@ function StatusBadge({ status }: { status: HuntStatus }) {
         live ? "bg-moss/15 text-moss" : "bg-muted text-muted-foreground"
       }`}
     >
-      {live && (
-        <motion.span
-          className="w-1.5 h-1.5 rounded-full bg-moss"
-          animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        />
-      )}
+        {live && <span className="w-1.5 h-1.5 rounded-full bg-moss animate-pulse" />}
       {huntStatusLabel(status)}
     </span>
   );

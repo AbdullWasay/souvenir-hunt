@@ -265,6 +265,41 @@
   @keyframes spin-slow { to { transform: rotate(360deg); } }
   .spin-slow { animation: spin-slow 24s linear infinite; }
 
+  /* Entrance + scroll reveal (no JS required for enter-anim) */
+  @keyframes enter-fade {
+    from {
+      opacity: 0;
+      transform: translate3d(var(--enter-x, 0), var(--enter-y, 0), 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes scroll-reveal-fade {
+    from {
+      opacity: 0;
+      transform: translate3d(var(--reveal-x, 0), var(--reveal-y, 24px), 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .enter-anim {
+      animation: enter-fade 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0s) both;
+    }
+
+    .scroll-reveal {
+      animation: scroll-reveal-fade 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0s) both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 28%;
+    }
+  }
+
   .field-input {
     @apply w-full rounded-xl border border-border bg-white px-3 py-2.5 text-sm text-ink outline-none focus:border-primary;
   }

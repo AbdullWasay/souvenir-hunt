@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { motion } from "motion/react";
 import { ArrowRight, MapPin, Lock } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
 import { huntStatusLabel } from "@/lib/types";
@@ -50,11 +49,7 @@ export function HomeHuntsSection({ hunts }: Props) {
                     <MapPin className="w-3 h-3" /> {featured.city}, {featured.country}
                   </span>
                   <span className="absolute top-5 left-5 inline-flex items-center gap-2 rounded-full bg-moss/90 text-white px-3 py-1 text-xs font-medium">
-                    <motion.span
-                      className="w-1.5 h-1.5 rounded-full bg-white"
-                      animate={{ scale: [1, 1.4, 1], opacity: [1, 0.6, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                     Live now
                   </span>
                 </div>
