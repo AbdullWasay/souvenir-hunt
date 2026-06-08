@@ -2,6 +2,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { CheckCircle2, KeyRound, ShieldCheck } from "lucide-react";
 import { closeHuntProgress, getStaffCloseContext } from "@/server/checkout";
+import { SiteCityscapeBg } from "@/components/site/SiteCityscapeBg";
 
 export const Route = createFileRoute("/staff/close/$token")({
   loader: ({ params }) => getStaffCloseContext({ data: params.token }),
@@ -32,8 +33,10 @@ function StaffClosePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-background">
-      <div className="flex flex-col items-center gap-3 mb-8 sm:mb-10">
+    <div className="relative isolate flex min-h-screen flex-col items-center justify-center px-4 py-12">
+      <SiteCityscapeBg />
+      <div className="relative z-[1] flex w-full max-w-md flex-col items-center">
+      <div className="mb-8 flex flex-col items-center gap-3 sm:mb-10">
         <div className="flex items-center gap-3">
           <img
             src="/assets/branding/logo-main.svg"
@@ -47,7 +50,7 @@ function StaffClosePage() {
         </div>
       </div>
 
-      <div className="w-full max-w-md">
+      <div className="w-full">
         <div className="text-center">
           <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 text-primary px-4 py-1.5 text-xs font-semibold uppercase tracking-widest">
             <ShieldCheck className="w-4 h-4" />
@@ -111,6 +114,7 @@ function StaffClosePage() {
             </>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

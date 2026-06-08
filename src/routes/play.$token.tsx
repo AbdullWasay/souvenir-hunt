@@ -477,7 +477,7 @@ function PlayPage() {
                           <Lightbulb className="w-4 h-4 shrink-0" />
                           Hint {revealedHints}
                         </div>
-                        <p className="mt-2 text-[0.85rem] text-amber-950/90 leading-relaxed italic text-left">
+                        <p className="mt-2 text-center text-[0.85rem] italic leading-relaxed text-amber-950/90">
                           {hints[revealedHints - 1]?.text}
                         </p>
                       </div>
@@ -493,22 +493,22 @@ function PlayPage() {
                         autoCapitalize="off"
                         enterKeyHint="done"
                       />
-                      <div className="flex justify-center gap-2">
+                      <div className="grid grid-cols-2 gap-2.5">
                         <button
                           type="submit"
                           disabled={saving || !answer.trim()}
-                          className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-primary text-white px-5 text-sm font-semibold disabled:opacity-50 touch-manipulation"
+                          className="flex h-11 w-full items-center justify-center gap-1.5 rounded-full bg-primary text-sm font-semibold text-white shadow-sm transition-opacity disabled:opacity-50 touch-manipulation"
                         >
-                          <Check className="w-4 h-4" />
+                          <Check className="h-4 w-4 shrink-0" />
                           Submit
                         </button>
                         <button
                           type="button"
                           onClick={handleRevealHint}
                           disabled={hints.length === 0 || revealedHints >= hints.length}
-                          className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-primary/30 bg-white px-5 text-sm font-semibold text-primary disabled:opacity-40 touch-manipulation"
+                          className="flex h-11 w-full items-center justify-center gap-1.5 rounded-full border border-primary/25 bg-white text-sm font-semibold text-primary transition-opacity disabled:opacity-40 touch-manipulation"
                         >
-                          <Sparkles className="w-3.5 h-3.5" />
+                          <Sparkles className="h-3.5 w-3.5 shrink-0" />
                           Hint
                         </button>
                       </div>
@@ -525,24 +525,24 @@ function PlayPage() {
             )}
           </div>
 
-          <div className="mt-2.5 flex justify-center gap-2">
+          <div className="mt-2.5 grid grid-cols-2 gap-2.5">
             <button
               type="button"
               onClick={goPrevTab}
               disabled={activeTabIndex <= 0}
-              className="inline-flex h-9 items-center gap-1 rounded-full border border-border bg-white px-4 text-sm font-medium disabled:opacity-40 touch-manipulation"
+              className="flex h-10 w-full items-center justify-center gap-1 rounded-full border border-border bg-white text-sm font-medium disabled:opacity-40 touch-manipulation"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4 shrink-0" />
               Back
             </button>
             <button
               type="button"
               onClick={goNextTab}
               disabled={activeTabIndex >= TAB_KEYS.length - 1}
-              className="inline-flex h-9 items-center gap-1 rounded-full bg-primary px-4 text-sm font-medium text-white disabled:opacity-40 touch-manipulation"
+              className="flex h-10 w-full items-center justify-center gap-1 rounded-full bg-primary text-sm font-medium text-white shadow-sm disabled:opacity-40 touch-manipulation"
             >
               Next
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 shrink-0" />
             </button>
           </div>
 
