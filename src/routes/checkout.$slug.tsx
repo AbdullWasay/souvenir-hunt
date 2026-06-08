@@ -13,6 +13,7 @@ import {
   Lock,
 } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
+import { SiteCityscapeBg } from "@/components/site/SiteCityscapeBg";
 import { getHuntBySlug } from "@/server/hunts";
 import { createCheckoutSession } from "@/server/checkout";
 import { isHuntBookable } from "@/lib/types";
@@ -53,7 +54,9 @@ function CheckoutPage() {
   const heroImage = hunt.heroImageUrl || HUNT_IMAGE_FALLBACK;
 
   return (
-    <div className="pb-20">
+    <div className="relative isolate pb-20">
+      <SiteCityscapeBg />
+      <div className="relative z-[1]">
       {/* Top banner */}
       <section className="relative overflow-hidden border-b border-border/60">
         <div className="absolute inset-0">
@@ -268,6 +271,7 @@ function CheckoutPage() {
             </article>
           </Reveal>
         </div>
+      </div>
       </div>
     </div>
   );

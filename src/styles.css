@@ -105,6 +105,10 @@
     background-image: var(--gradient-mesh);
     background-attachment: fixed;
   }
+  body.home-parallax-active {
+    background: #f0f5ff;
+    background-image: none;
+  }
   h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.03em; }
   ::selection { background: var(--color-primary); color: #fff; }
 
@@ -264,6 +268,47 @@
 
   @keyframes spin-slow { to { transform: rotate(360deg); } }
   .spin-slow { animation: spin-slow 24s linear infinite; }
+
+  /* Home page — fixed cityscape background (content scrolls over it) */
+  .home-scene {
+    position: fixed;
+  }
+  @media (max-width: 767px) {
+    .home-illustration-wrap {
+      transform: translateY(12%);
+    }
+  }
+  .hero-kpi-scroll {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hero-kpi-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Play hunt — mobile parallax scene */
+  .play-scene {
+    --play-scroll: 0px;
+  }
+  .play-layer-back {
+    will-change: transform;
+    transform: translate3d(0, calc(var(--play-scroll) * 0.1), 0);
+  }
+  .play-layer-mid {
+    will-change: transform;
+    transform: translate3d(0, calc(var(--play-scroll) * 0.22), 0);
+  }
+  .play-layer-front {
+    will-change: transform;
+    transform: translate3d(0, calc(var(--play-scroll) * 0.06), 0);
+  }
+  .play-mobile .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .play-mobile .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
 
   /* Entrance + scroll reveal (no JS required for enter-anim) */
   @keyframes enter-fade {

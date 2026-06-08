@@ -8,9 +8,21 @@ import {
   Lightbulb,
   MapPin,
   Sparkles,
-  Trophy,
 } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
+import {
+  PlayActions,
+  PlayGlassCard,
+  PlayIntroHero,
+  PlayLinkBtn,
+  PlayMobileShell,
+  PlayPrimaryBtn,
+  PlaySecondaryBtn,
+  PlayActiveSession,
+  PlaySectionHeader,
+  PlayStartCard,
+  PlayTabBar,
+} from "@/components/play/PlayMobileUi";
 import { getOrderByAccessToken, saveHuntProgress } from "@/server/checkout";
 import { stepFieldParagraphs, stepAcceptsAnswer } from "@/lib/hunt-utils";
 
@@ -105,15 +117,19 @@ const TAB_CONFIG = [
 
 function StepBody({ paragraphs, italic }: { paragraphs: string[]; italic?: boolean }) {
   if (paragraphs.length === 0) {
-    return <p className="text-foreground/80 leading-relaxed">No content for this section yet.</p>;
+    return (
+      <p className="text-left text-[0.85rem] leading-relaxed text-foreground/80">
+        No content for this section yet.
+      </p>
+    );
   }
   return (
-    <div className="space-y-5">
+    <div className="space-y-2 text-left">
       {paragraphs.map((p, i) => (
         <p
           key={i}
-          className={`text-[0.98rem] sm:text-[1.05rem] text-foreground/85 leading-[1.8] ${
-            italic ? "italic font-display" : ""
+          className={`text-[0.82rem] leading-[1.55] text-foreground/85 text-pretty ${
+            italic ? "font-display italic" : ""
           }`}
         >
           {p}
@@ -124,54 +140,6 @@ function StepBody({ paragraphs, italic }: { paragraphs: string[]; italic?: boole
 }
 
 const TAB_KEYS = TAB_CONFIG.map((t) => t.key);
-
-function StepHeroBanner({
-  imageUrl,
-  label,
-  splitDesktop = false,
-}: {
-  imageUrl: string;
-  label: string;
-  splitDesktop?: boolean;
-}) {
-  return (
-    <div
-      className={`relative overflow-hidden rounded-xl bg-muted ${
-        splitDesktop
-          ? "aspect-[16/10] sm:aspect-[2/1] lg:aspect-[4/3] lg:min-h-0 lg:max-h-[min(38vh,320px)]"
-          : "aspect-[16/10] sm:aspect-[2/1]"
-      }`}
-    >
-      <img src={imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/20 to-transparent" />
-      <p className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] text-white">
-        {label}
-      </p>
-    </div>
-  );
-}
-
-function PlayIntroLayout({
-  imageUrl,
-  children,
-}: {
-  imageUrl: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="w-full max-w-xl md:max-w-2xl lg:max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-12 lg:py-16 pb-28">
-      <div className="lg:grid lg:grid-cols-2 lg:gap-10 xl:gap-14 lg:items-center">
-        <div className="hidden lg:block">
-          <div className="relative overflow-hidden rounded-2xl aspect-[4/5] max-h-[min(72vh,560px)] bg-muted shadow-paper">
-            <img src={imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-ink/45 via-ink/10 to-transparent" />
-          </div>
-        </div>
-        <div>{children}</div>
-      </div>
-    </div>
-  );
-}
 
 function PlayPage() {
   const data = Route.useLoaderData();
@@ -323,89 +291,62 @@ function PlayPage() {
     void persist(stepIndex, completed, { introCompleted: true, revealedHints: next });
   }
 
-  const shellClass =
-    "w-full max-w-xl md:max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-28";
-
   if (finished || steps.length === 0) {
     const qrUrl = staffCloseUrl
       ? `https://quickchart.io/qr?size=280&text=${encodeURIComponent(staffCloseUrl)}`
       : null;
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-10 sm:py-16 pb-28">
-        <div className="flex flex-col items-center gap-3 mb-6 sm:mb-8">
-          <div className="flex items-center gap-3">
-            <img
-              src="/assets/branding/logo-main.svg"
-              alt=""
-              aria-hidden
-              className="h-10 sm:h-12 w-auto shrink-0 object-contain [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(98%)_saturate(4688%)_hue-rotate(221deg)_brightness(101%)_contrast(103%)]"
-            />
-            <span className="font-display font-bold text-[1.35rem] sm:text-[1.65rem] leading-none text-primary tracking-tight">
-              Souvenir Hunt
-            </span>
-          </div>
-        </div>
+      <PlayMobileShell>
+        <div className="flex flex-col items-center gap-4 py-4">
+        <Reveal>
+          <PlaySectionHeader
+            label={closed ? "All done" : "Treasure"}
+            title={closed ? "Hunt closed" : "Hunt complete!"}
+            subtitle={
+              closed
+                ? "Staff confirmed your souvenir pickup. Thanks for playing."
+                : "Show this QR code to staff to collect your souvenir."
+            }
+          />
+        </Reveal>
 
-        <div className="w-full max-w-md">
-          <Reveal>
-            <div className="text-center">
-              <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary mx-auto">
-                {closed ? <CheckCircle2 className="w-7 h-7" /> : <Trophy className="w-7 h-7" />}
-              </span>
-              <h1 className="mt-5 font-display text-[1.75rem] sm:text-3xl font-semibold text-ink">
-                {closed ? "Hunt closed" : "Hunt complete!"}
-              </h1>
-              <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
-                {closed
-                  ? "Staff confirmed your souvenir pickup. Thanks for playing."
-                  : "Show this QR code to staff to collect your souvenir treasure."}
+        {!closed && qrUrl && (
+          <Reveal delay={0.08}>
+            <PlayGlassCard className="mt-8 mx-auto w-full max-w-[300px]">
+              <div className="rounded-xl bg-white p-3 border border-border/60">
+                <img src={qrUrl} alt="Staff QR code" className="w-full aspect-square rounded-lg" />
+              </div>
+              <p className="mt-4 text-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                Game ID · {gameId}
               </p>
-            </div>
+              <p className="mt-1.5 text-center text-[11px] text-muted-foreground">Waiting for staff…</p>
+            </PlayGlassCard>
           </Reveal>
+        )}
 
-          {!closed && qrUrl && (
-            <Reveal delay={0.08}>
-              <div className="mt-8 rounded-[1.75rem] border border-primary/20 bg-gradient-to-b from-white to-primary/[0.04] p-6 sm:p-8 shadow-[0_8px_40px_-12px_rgba(10,77,255,0.22)]">
-                <div className="rounded-2xl bg-white p-4 sm:p-5 border border-border/80 shadow-sm mx-auto max-w-[280px]">
-                  <img
-                    src={qrUrl}
-                    alt="Staff QR code"
-                    className="w-full aspect-square rounded-xl"
-                  />
-                </div>
-                <p className="mt-5 text-center font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                  Game ID · {gameId}
-                </p>
-                <p className="mt-2 text-center text-xs text-muted-foreground">
-                  Waiting for staff confirmation…
-                </p>
-              </div>
-            </Reveal>
-          )}
-
-          {closed && (
-            <Reveal delay={0.08}>
-              <div className="mt-8 rounded-2xl border border-moss/30 bg-moss/5 px-6 py-8 text-center">
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  Your hunt is officially complete. We hope you enjoyed exploring Split.
-                </p>
-              </div>
-            </Reveal>
-          )}
-
-          <Reveal delay={0.12}>
-            <div className="mt-8 text-center">
-              <Link
-                to="/"
-                className="inline-flex items-center justify-center rounded-full bg-primary text-white px-8 py-3.5 text-sm font-medium shadow-sm hover:shadow-md transition-shadow"
-              >
-                Back home
-              </Link>
-            </div>
+        {closed && (
+          <Reveal delay={0.08}>
+            <PlayGlassCard className="mt-8 text-center">
+              <p className="text-[0.9rem] text-foreground/80 leading-relaxed">
+                Your hunt is officially complete. We hope you enjoyed exploring {hunt.city}.
+              </p>
+            </PlayGlassCard>
           </Reveal>
+        )}
+
+        <Reveal delay={0.12}>
+          <PlayActions>
+            <Link
+              to="/"
+              className="btn-shine inline-flex items-center justify-center rounded-full bg-primary text-white px-8 py-3.5 text-sm font-medium shadow-paper min-w-[11.5rem]"
+            >
+              Back home
+            </Link>
+          </PlayActions>
+        </Reveal>
         </div>
-      </div>
+      </PlayMobileShell>
     );
   }
 
@@ -414,324 +355,201 @@ function PlayPage() {
     const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(startLocation)}`;
 
     return (
-      <PlayIntroLayout imageUrl={stepImage}>
+      <PlayMobileShell>
         <Reveal>
-          <p className="font-mono text-[11px] sm:text-xs uppercase tracking-widest text-primary mb-2">
-            Before you start
-          </p>
-          <h1 className="font-display text-[1.65rem] sm:text-3xl font-semibold text-ink leading-tight">
-            Go to the start location
-          </h1>
-          <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Head to the starting point first. Once you are there, begin the run and follow the story on location.
-          </p>
+          <PlayStartCard
+            imageUrl={stepImage}
+            label="Before you start"
+            title="Go to the start"
+            hint="Walk to the starting point first. When you arrive, begin the run on location."
+            locationLabel={hunt.locationLabel}
+            cityCountry={`${hunt.city}, ${hunt.country}`}
+          >
+            <PlayLinkBtn href={mapsUrl} target="_blank" rel="noreferrer">
+              Open in Maps
+            </PlayLinkBtn>
+            <PlaySecondaryBtn type="button" onClick={() => setPhase("guidelines")}>
+              I&apos;m on start location
+            </PlaySecondaryBtn>
+          </PlayStartCard>
         </Reveal>
-
-        <Reveal delay={0.08}>
-          <div className="mt-6 sm:mt-8 rounded-2xl border border-border bg-card p-5 sm:p-6 md:p-8 shadow-paper">
-            <p className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Start point
-            </p>
-            <h2 className="mt-2 font-display text-lg sm:text-xl text-ink">{hunt.locationLabel}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {hunt.city}, {hunt.country}
-            </p>
-            <p className="mt-4 text-sm text-foreground/80 leading-relaxed">
-              Open the location in Maps, walk to the start point, and when you arrive begin the run from there.
-            </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <a
-                href={mapsUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="flex-1 inline-flex items-center justify-center rounded-full bg-primary text-white px-6 py-3.5 text-sm font-medium"
-              >
-                Get to start point
-              </a>
-              <button
-                type="button"
-                onClick={() => setPhase("guidelines")}
-                className="flex-1 rounded-full border border-border px-6 py-3.5 text-sm font-medium text-ink hover:bg-muted transition-colors"
-              >
-                I&apos;m on start location
-              </button>
-            </div>
-          </div>
-        </Reveal>
-      </PlayIntroLayout>
+      </PlayMobileShell>
     );
   }
 
   if (phase === "guidelines") {
     return (
-      <PlayIntroLayout imageUrl={stepImage}>
+      <PlayMobileShell>
         <Reveal>
-          <p className="font-mono text-[11px] sm:text-xs uppercase tracking-widest text-muted-foreground">
-            Game ID: {gameId}
-          </p>
-          <h1 className="mt-1 font-display text-[1.65rem] sm:text-3xl font-semibold text-primary leading-tight">
-            {hunt.name}
-          </h1>
-          <p className="mt-3 text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Learn how each part of the hunt works before you start exploring the city.
-          </p>
+        <PlayIntroHero
+          imageUrl={stepImage}
+          label={`Game · ${gameId}`}
+          title={hunt.name}
+          hint="Story, history, clue & guide on each stop."
+        />
         </Reveal>
 
-        <Reveal delay={0.08}>
-          <div className="mt-6 sm:mt-8 grid sm:grid-cols-2 gap-3">
+        <Reveal delay={0.06}>
+        <div className="space-y-2.5">
             {[
-              {
-                title: "Story",
-                body: "The narrative thread — mood, stakes, and mystery behind each stop.",
-              },
-              {
-                title: "History",
-                body: "Real background of where you stand, rooted in the actual city.",
-              },
-              {
-                title: "Clue",
-                body: "What to look for and the riddle you solve on location.",
-              },
-              {
-                title: "Guide",
-                body: "How to observe the space and move through each step calmly.",
-              },
+              { title: "Story", body: "Mood and mystery at each stop." },
+              { title: "History", body: "Real background of where you stand." },
+              { title: "Clue", body: "What to find and the riddle to solve." },
+              { title: "Guide", body: "How to observe the space calmly." },
             ].map((item, index) => (
               <div
                 key={item.title}
-                className="flex items-start gap-3 rounded-2xl border border-border bg-card px-4 sm:px-5 py-4 text-sm shadow-paper"
+                className="glass flex items-center gap-3 rounded-2xl border border-white/80 px-4 py-3"
               >
-                <div className="h-7 w-7 shrink-0 rounded-full bg-primary text-white grid place-items-center text-xs font-semibold">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-semibold text-white">
                   {index + 1}
-                </div>
-                <div>
-                  <p className="font-semibold uppercase tracking-[0.16em] text-xs text-muted-foreground">
-                    {item.title}
-                  </p>
-                  <p className="mt-1 text-foreground/80 leading-relaxed">{item.body}</p>
+                </span>
+                <div className="min-w-0 flex-1 text-center sm:text-left">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-primary">{item.title}</p>
+                  <p className="mt-0.5 text-[0.8rem] leading-snug text-foreground/75">{item.body}</p>
                 </div>
               </div>
             ))}
-          </div>
+        </div>
         </Reveal>
 
-        <Reveal delay={0.14}>
-          <button
-            type="button"
-            onClick={startGame}
-            className="mt-8 sm:mt-10 w-full rounded-full bg-primary text-white px-6 py-4 text-sm font-medium shadow-paper hover:shadow-glow transition-shadow"
-          >
+        <Reveal delay={0.12}>
+        <PlayActions>
+          <PlayPrimaryBtn type="button" onClick={startGame}>
             Start game
-          </button>
+          </PlayPrimaryBtn>
+        </PlayActions>
         </Reveal>
-      </PlayIntroLayout>
+      </PlayMobileShell>
     );
   }
 
+  const activeTabLabel = TAB_CONFIG.find((t) => t.key === activeTab)?.label ?? activeTab;
+
   return (
-    <div className={shellClass}>
+    <PlayMobileShell>
       <Reveal>
-        <p className="font-mono text-[11px] sm:text-xs uppercase tracking-widest text-muted-foreground">
-          Game ID: {gameId}
-        </p>
-        <h1 className="mt-1 font-display text-[1.65rem] sm:text-3xl font-semibold text-primary leading-tight">
-          {hunt.name}
-        </h1>
+      <PlayActiveSession
+        gameId={gameId}
+        huntName={hunt.name}
+        stepNumber={viewIndex + 1}
+        stepTotal={steps.length}
+        stepTitle={step?.title ?? `Stop ${viewIndex + 1}`}
+        location={step?.location}
+        progressPct={progressPct}
+        total={steps.length}
+        current={stepIndex}
+        completedIds={completed}
+        stepIds={steps.map((s) => s.id)}
+        viewing={viewIndex}
+        onSelect={goToStep}
+        heroImage={stepImage}
+        heroLabel={activeTabLabel}
+      >
+          <PlayTabBar
+            tabs={TAB_CONFIG}
+            active={activeTab}
+            onChange={(key) => {
+              setActiveTab(key as typeof activeTab);
+              if (key !== "clue") setMessage(null);
+            }}
+          />
 
-        {/* Progress */}
-        <div className="mt-5 sm:mt-6">
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Progress:</p>
-          <div className="mt-2 h-3 rounded-full bg-primary/15 overflow-hidden">
-            <div
-              className="h-full rounded-full bg-primary transition-all duration-500"
-              style={{ width: `${Math.max(progressPct, isCurrentStep ? 8 : 0)}%` }}
-            />
-          </div>
-          <div className="mt-3 -mx-1 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-            {steps.map((s, i) => {
-              const done = completed.includes(s.id);
-              const current = i === stepIndex;
-              const viewing = i === viewIndex;
-              const locked = i > stepIndex;
-              return (
-                <button
-                  key={s.id}
-                  type="button"
-                  disabled={locked}
-                  onClick={() => goToStep(i)}
-                  className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors touch-manipulation ${
-                    viewing
-                      ? "bg-primary text-white shadow-sm"
-                      : done
-                        ? "bg-primary/15 text-primary hover:bg-primary/25"
-                        : current
-                          ? "bg-primary/25 text-primary ring-2 ring-primary/30"
-                          : locked
-                            ? "bg-muted/80 text-muted-foreground/50 cursor-not-allowed"
-                            : "bg-primary/10 text-primary/80 hover:bg-primary/20"
-                  }`}
-                >
-                  Step {i + 1}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </Reveal>
+          <div className="mt-2 space-y-2.5">
+            {activeTab === "clue" ? (
+              <div className="space-y-3">
+                {clueInstruction && (
+                  <p className="text-[0.88rem] italic text-foreground/80 leading-relaxed text-left text-pretty">
+                    {clueInstruction}
+                  </p>
+                )}
+                {clueQuestionParts.map((p, i) => (
+                  <p key={i} className="text-[0.9rem] font-medium text-ink leading-relaxed text-left text-pretty">
+                    {p}
+                  </p>
+                ))}
 
-      <Reveal delay={0.06}>
-        <div className="mt-6 rounded-[1.75rem] border border-primary/20 bg-gradient-to-b from-white via-white to-primary/[0.04] p-4 sm:p-6 shadow-[0_8px_40px_-12px_rgba(10,77,255,0.25)]">
-          <h2 className="font-display text-lg sm:text-xl font-bold uppercase tracking-wide text-primary">
-            {step?.title ?? `Step ${viewIndex + 1}`}
-          </h2>
-          {step?.location && (
-            <p className="mt-1 flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
-              <MapPin className="w-3.5 h-3.5 shrink-0" /> {step.location}
-            </p>
-          )}
-
-          {/* Tabs */}
-          <div className="mt-4 flex gap-2 overflow-x-auto pb-0.5 scrollbar-none">
-            {TAB_CONFIG.map(({ key, label }) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => {
-                  setActiveTab(key);
-                  if (key !== "clue") setMessage(null);
-                }}
-                className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors touch-manipulation ${
-                  activeTab === key
-                    ? "bg-primary text-white shadow-sm"
-                    : "bg-primary/10 text-primary hover:bg-primary/20"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {/* Content card — stacked on mobile, image left / text right on desktop */}
-          <div className="mt-4 rounded-2xl border border-border/80 bg-white p-4 sm:p-5 shadow-sm">
-            <div className="lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-6 lg:items-start">
-              <div className="lg:sticky lg:top-28">
-                <StepHeroBanner
-                  imageUrl={stepImage}
-                  label={activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
-                  splitDesktop
-                />
-              </div>
-
-              <div className="mt-4 lg:mt-0 space-y-4 lg:max-h-[min(55vh,420px)] lg:overflow-y-auto lg:pr-1">
-                {activeTab === "clue" ? (
-                  <div className="space-y-4 border-t border-border/60 pt-4 lg:border-t-0 lg:pt-0">
-                    {clueInstruction && (
-                      <p className="text-sm sm:text-[0.95rem] italic text-foreground/80 leading-relaxed">
-                        {clueInstruction}
-                      </p>
-                    )}
-
-                    {clueQuestionParts.length > 0 && (
-                      <div className="space-y-3 border-t border-border/60 pt-4 lg:border-t-0 lg:pt-0">
-                        {clueQuestionParts.map((p, i) => (
-                          <p key={i} className="text-[0.98rem] sm:text-base font-medium text-ink leading-relaxed">
-                            {p}
-                          </p>
-                        ))}
+                {isCurrentStep ? (
+                  <>
+                    {revealedHints > 0 && (
+                      <div className="rounded-xl bg-amber-50/95 border border-amber-200/70 p-3.5">
+                        <div className="flex items-center justify-center gap-2 text-amber-900 text-sm font-medium">
+                          <Lightbulb className="w-4 h-4 shrink-0" />
+                          Hint {revealedHints}
+                        </div>
+                        <p className="mt-2 text-[0.85rem] text-amber-950/90 leading-relaxed italic text-left">
+                          {hints[revealedHints - 1]?.text}
+                        </p>
                       </div>
                     )}
 
-                    {isCurrentStep ? (
-                      <>
-                        {revealedHints > 0 && (
-                          <div className="rounded-xl bg-amber-50 border border-amber-200/70 p-3.5 sm:p-4">
-                            <div className="flex items-center gap-2 text-amber-900 text-sm font-medium">
-                              <Lightbulb className="w-4 h-4 shrink-0" />
-                              Hint {revealedHints}
-                            </div>
-                            <p className="mt-2 text-sm text-amber-950/90 leading-relaxed italic">
-                              {hints[revealedHints - 1]?.text}
-                            </p>
-                          </div>
-                        )}
-
-                        <form onSubmit={submitAnswer} className="space-y-3 pt-1 border-t border-border/60 lg:border-t-0">
-                          <input
-                            value={answer}
-                            onChange={(e) => setAnswer(e.target.value)}
-                            className="w-full rounded-xl border border-border bg-white px-4 py-3.5 text-base font-mono outline-none focus:border-primary focus:ring-2 focus:ring-primary/15"
-                            placeholder="Type your answer"
-                            autoComplete="off"
-                            autoCapitalize="off"
-                            enterKeyHint="done"
-                          />
-
-                          <div className="grid grid-cols-2 gap-3">
-                            <button
-                              type="submit"
-                              disabled={saving || !answer.trim()}
-                              className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-primary text-white text-sm font-semibold shadow-sm hover:shadow-md disabled:opacity-50 transition-shadow touch-manipulation"
-                            >
-                              <span className="grid place-items-center w-7 h-7 rounded-full bg-white/20">
-                                <Check className="w-4 h-4" />
-                              </span>
-                              Submit
-                            </button>
-                            <button
-                              type="button"
-                              onClick={handleRevealHint}
-                              disabled={hints.length === 0 || revealedHints >= hints.length}
-                              className="inline-flex h-12 items-center justify-center gap-2 rounded-full border-2 border-primary/30 bg-white text-primary text-sm font-semibold hover:bg-primary/5 disabled:opacity-40 disabled:pointer-events-none transition-colors touch-manipulation"
-                            >
-                              <Sparkles className="w-4 h-4 shrink-0" />
-                              {revealedHints >= hints.length && hints.length > 0
-                                ? "No hints"
-                                : "Get hint"}
-                            </button>
-                          </div>
-                        </form>
-                      </>
-                    ) : (
-                      <p className="text-sm text-muted-foreground italic border-t border-border/60 pt-4 lg:border-t-0 lg:pt-0">
-                        You&apos;ve already completed this step. Review the clue above or continue on your current step.
-                      </p>
-                    )}
-                  </div>
+                    <form onSubmit={submitAnswer} className="space-y-2.5 pt-0.5">
+                      <input
+                        value={answer}
+                        onChange={(e) => setAnswer(e.target.value)}
+                        className="w-full rounded-xl border border-border bg-white/95 px-4 py-2.5 text-base font-mono text-center outline-none focus:border-primary focus:ring-2 focus:ring-primary/15"
+                        placeholder="Your answer"
+                        autoComplete="off"
+                        autoCapitalize="off"
+                        enterKeyHint="done"
+                      />
+                      <div className="flex justify-center gap-2">
+                        <button
+                          type="submit"
+                          disabled={saving || !answer.trim()}
+                          className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-primary text-white px-5 text-sm font-semibold disabled:opacity-50 touch-manipulation"
+                        >
+                          <Check className="w-4 h-4" />
+                          Submit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleRevealHint}
+                          disabled={hints.length === 0 || revealedHints >= hints.length}
+                          className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-primary/30 bg-white px-5 text-sm font-semibold text-primary disabled:opacity-40 touch-manipulation"
+                        >
+                          <Sparkles className="w-3.5 h-3.5" />
+                          Hint
+                        </button>
+                      </div>
+                    </form>
+                  </>
                 ) : (
-                  <div className="border-t border-border/60 pt-4 lg:border-t-0 lg:pt-0">
-                    <StepBody paragraphs={tabParagraphs} italic />
-                  </div>
+                  <p className="text-[0.82rem] text-muted-foreground italic text-left">
+                    Step completed — review or continue on your current stop.
+                  </p>
                 )}
               </div>
-            </div>
+            ) : (
+              <StepBody paragraphs={tabParagraphs} italic={activeTab === "story"} />
+            )}
           </div>
 
-          {/* Tab navigation */}
-          <div className="mt-4 grid grid-cols-2 gap-3">
+          <div className="mt-2.5 flex justify-center gap-2">
             <button
               type="button"
               onClick={goPrevTab}
               disabled={activeTabIndex <= 0}
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-border bg-white text-ink text-sm font-medium hover:bg-muted/50 disabled:opacity-40 disabled:pointer-events-none transition-colors touch-manipulation"
+              className="inline-flex h-9 items-center gap-1 rounded-full border border-border bg-white px-4 text-sm font-medium disabled:opacity-40 touch-manipulation"
             >
-              <ArrowLeft className="w-4 h-4" />
-              Previous
+              <ArrowLeft className="h-4 w-4" />
+              Back
             </button>
             <button
               type="button"
               onClick={goNextTab}
               disabled={activeTabIndex >= TAB_KEYS.length - 1}
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-primary text-white text-sm font-medium shadow-sm hover:shadow-md disabled:opacity-40 disabled:pointer-events-none transition-colors touch-manipulation"
+              className="inline-flex h-9 items-center gap-1 rounded-full bg-primary px-4 text-sm font-medium text-white disabled:opacity-40 touch-manipulation"
             >
               Next
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="h-4 w-4" />
             </button>
           </div>
 
           {message && (
             <p
-              className={`mt-4 text-center text-sm ${
-                message.startsWith("Correct")
+              className={`mt-2.5 text-center text-[0.82rem] ${
+                message.startsWith("Correct") || message.startsWith("Hunt complete")
                   ? "text-moss font-medium"
                   : message.startsWith("Could not")
                     ? "text-red-600"
@@ -743,12 +561,12 @@ function PlayPage() {
           )}
 
           {!isCurrentStep && !message && (
-            <p className="mt-4 text-center text-xs text-muted-foreground">
-              Viewing step {viewIndex + 1} · your current step is {stepIndex + 1}
+            <p className="mt-2 text-center text-[10px] text-muted-foreground">
+              Viewing stop {viewIndex + 1} · current is {stepIndex + 1}
             </p>
           )}
-        </div>
+      </PlayActiveSession>
       </Reveal>
-    </div>
+    </PlayMobileShell>
   );
 }

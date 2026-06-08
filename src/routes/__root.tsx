@@ -90,30 +90,37 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const hideChrome = useRouterState({
+  const routeMeta = useRouterState({
     select: (s) => {
       const p = s.location.pathname;
-      if (p.startsWith("/admin") || p.startsWith("/staff")) return true;
-      if (p.startsWith("/play/") && s.location.hash === "complete") return true;
-      return false;
+      const hideChrome = p.startsWith("/admin") || p.startsWith("/staff");
+      const hideHeaderFooter =
+        p.startsWith("/play/") && s.location.hash.replace(/^#/, "") === "complete";
+      const isPlay = p.startsWith("/play/");
+      return { hideChrome, hideHeaderFooter, isPlay };
     },
   });
+  const { hideChrome, hideHeaderFooter, isPlay } = routeMeta;
 
   return (
     <QueryClientProvider client={queryClient}>
       {!hideChrome && <CursorGlow />}
       {!hideChrome && <ScrollProgress />}
-      {!hideChrome && <Header />}
+      {!hideChrome && !hideHeaderFooter && <Header />}
       <main
         className={
-          hideChrome ? "relative z-10 isolate min-h-screen" : "relative z-10 pt-28 isolate"
+          hideChrome
+            ? "relative z-10 isolate min-h-screen"
+            : isPlay
+              ? "relative z-10 pt-[5.5rem] sm:pt-28 isolate"
+              : "relative z-10 pt-28 isolate"
         }
       >
         <Outlet />
       </main>
-      {!hideChrome && (
+      {!hideChrome && !hideHeaderFooter && (
         <div className="relative z-10">
-          <Footer />
+          <Footer variant={isPlay ? "play" : "default"} />
         </div>
       )}
     </QueryClientProvider>

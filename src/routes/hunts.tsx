@@ -149,18 +149,18 @@ function HuntsPage() {
                   ))}
                 </div>
 
-                <div className="mt-6 flex flex-wrap gap-2">
+                <div className="mt-5 flex flex-col items-center gap-2.5 md:mt-6 md:flex-row md:flex-wrap md:items-start md:justify-start">
                   <Link
                     to="/checkout/$slug"
                     params={{ slug: hunt.slug }}
-                    className="group inline-flex items-center justify-between gap-3 rounded-full bg-ink text-parchment px-5 py-3.5 text-sm font-medium hover:bg-primary transition-colors"
+                    className="group inline-flex w-full max-w-[320px] items-center justify-center gap-2 rounded-full bg-ink px-5 py-3.5 text-sm font-medium text-parchment transition-colors hover:bg-primary md:w-auto md:max-w-none"
                   >
                     Pay & Start Hunt
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link
                     to="/your-hunt"
-                    className="inline-flex items-center justify-center rounded-full border border-border px-5 py-3.5 text-sm font-medium text-ink hover:bg-muted transition-colors"
+                    className="inline-flex w-full max-w-[320px] items-center justify-center rounded-full border border-border bg-white px-5 py-3.5 text-sm font-medium text-ink transition-colors hover:bg-muted md:w-auto md:max-w-none"
                   >
                     Resume Existing Hunt
                   </Link>
