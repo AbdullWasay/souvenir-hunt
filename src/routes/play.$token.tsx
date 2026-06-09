@@ -440,7 +440,6 @@ function PlayPage() {
 
   return (
     <PlayMobileShell>
-      <Reveal>
       <PlayActiveSession
         gameId={gameId}
         huntName={hunt.name}
@@ -588,7 +587,6 @@ function PlayPage() {
             </p>
           )}
       </PlayActiveSession>
-      </Reveal>
     </PlayMobileShell>
   );
 }

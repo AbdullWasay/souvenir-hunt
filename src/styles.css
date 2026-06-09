@@ -306,6 +306,15 @@
     will-change: transform;
     transform: translate3d(0, calc(var(--play-scroll) * 0.06), 0);
   }
+  /* Play hunt — mobile scroll (document scroll, not trapped inner panel) */
+  .play-mobile {
+    overflow: visible;
+    touch-action: pan-y;
+  }
+  .play-mobile-inner {
+    overflow: visible;
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
   .play-mobile .scrollbar-none {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -314,10 +323,21 @@
     display: none;
   }
 
-  /* iOS Safari — play hunt stability */
+  /* iOS Safari — smooth document scroll on play + parallax pages */
   @supports (-webkit-touch-callout: none) {
-    .play-mobile {
-      min-height: -webkit-fill-available;
+    html:has(.play-mobile),
+    html:has(.home-page) {
+      height: auto;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    body:has(.play-mobile),
+    body.home-parallax-active {
+      height: auto;
+      min-height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .play-mobile input,
     .play-mobile textarea,
@@ -327,9 +347,6 @@
     .play-mobile button {
       -webkit-tap-highlight-color: transparent;
     }
-  }
-  .play-mobile-inner {
-    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
   }
 
   /* Entrance + scroll reveal (no JS required for enter-anim) */

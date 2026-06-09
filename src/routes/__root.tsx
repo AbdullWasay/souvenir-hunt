@@ -112,7 +112,7 @@ function RootComponent() {
           hideChrome
             ? "relative z-10 isolate min-h-screen"
             : isPlay
-              ? "relative z-10 pt-[5.5rem] sm:pt-28 isolate"
+              ? "relative z-10 pt-[5.5rem] sm:pt-28"
               : "relative z-10 pt-28 isolate"
         }
       >
