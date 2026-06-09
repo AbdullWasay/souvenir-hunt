@@ -3,6 +3,7 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { KeyRound, ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
+import { SiteCityscapeBg } from "@/components/site/SiteCityscapeBg";
 import { getOrderByAccessToken } from "@/server/checkout";
 
 export const Route = createFileRoute("/your-hunt")({
@@ -41,7 +42,9 @@ function YourHuntPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-16 md:py-20">
+    <div className="relative isolate min-h-[70vh]">
+      <SiteCityscapeBg />
+      <div className="relative z-[1] mx-auto max-w-3xl px-5 py-12 sm:px-6 sm:py-16 md:py-20">
       <Reveal>
         <p className="font-mono text-xs tracking-[0.3em] uppercase text-accent">Your hunt</p>
       </Reveal>
@@ -95,6 +98,7 @@ function YourHuntPage() {
           </div>
         </form>
       </Reveal>
+      </div>
     </div>
   );
 }
