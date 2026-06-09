@@ -21,6 +21,7 @@ import {
   PlayActiveSession,
   PlaySectionHeader,
   PlayStartCard,
+  PlayStepNav,
   PlayTabBar,
 } from "@/components/play/PlayMobileUi";
 import { getOrderByAccessToken, saveHuntProgress } from "@/server/checkout";
@@ -108,11 +109,12 @@ function initialPhase(
 
 const HUNT_IMAGE_FALLBACK = "/assets/branding/split-hunt-image.svg";
 
-const TAB_CONFIG = [
-  { key: "story" as const, label: "Story" },
-  { key: "history" as const, label: "History" },
-  { key: "clue" as const, label: "Clue" },
-  { key: "guide" as const, label: "Guide" },
+type ActiveTab = "guide" | "story" | "clue";
+
+const TAB_CONFIG: { key: ActiveTab; label: string }[] = [
+  { key: "guide", label: "Guide" },
+  { key: "story", label: "Story" },
+  { key: "clue", label: "Clue" },
 ];
 
 function StepBody({ paragraphs, italic }: { paragraphs: string[]; italic?: boolean }) {
@@ -156,7 +158,7 @@ function PlayPage() {
     resolveInitialStepIndex(steps.length, progress, order.accessToken),
   );
   const [completed, setCompleted] = useState<string[]>(progress.completedStepIds);
-  const [activeTab, setActiveTab] = useState<"story" | "history" | "clue" | "guide">("story");
+  const [activeTab, setActiveTab] = useState<ActiveTab>("guide");
   const [answer, setAnswer] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [closed, setClosed] = useState(Boolean(progress.closedAt));
@@ -215,9 +217,20 @@ function PlayPage() {
   function goToStep(index: number) {
     if (index < 0 || index > stepIndex || index >= steps.length) return;
     setViewIndex(index);
-    setActiveTab("story");
+    setActiveTab("guide");
     setMessage(null);
   }
+
+  function goPrevStep() {
+    goToStep(viewIndex - 1);
+  }
+
+  function goNextStep() {
+    goToStep(viewIndex + 1);
+  }
+
+  const canGoPrevStep = viewIndex > 0;
+  const canGoNextStep = viewIndex < stepIndex;
 
   function goPrevTab() {
     if (activeTabIndex <= 0) return;
@@ -274,7 +287,7 @@ function PlayPage() {
       setAnswer("");
       setMessage(nextIndex >= steps.length ? "Hunt complete!" : "Correct. Next clue unlocked.");
       setRevealedHints(0);
-      setActiveTab("story");
+      setActiveTab("guide");
       setPhase("playing");
       await persist(nextIndex, nextCompleted, { introCompleted: true, revealedHints: 0 });
     } else {
@@ -385,17 +398,16 @@ function PlayPage() {
           imageUrl={stepImage}
           label={`Game · ${gameId}`}
           title={hunt.name}
-          hint="Story, history, clue & guide on each stop."
+          hint="Guide, story & clue on each stop."
         />
         </Reveal>
 
         <Reveal delay={0.06}>
         <div className="space-y-2.5">
             {[
-              { title: "Story", body: "Mood and mystery at each stop." },
-              { title: "History", body: "Real background of where you stand." },
-              { title: "Clue", body: "What to find and the riddle to solve." },
               { title: "Guide", body: "How to observe the space calmly." },
+              { title: "Story", body: "Mood and mystery at each stop." },
+              { title: "Clue", body: "What to find and the riddle to solve." },
             ].map((item, index) => (
               <div
                 key={item.title}
@@ -446,13 +458,23 @@ function PlayPage() {
         heroImage={stepImage}
         heroLabel={activeTabLabel}
       >
+          <PlayStepNav
+            stepNumber={viewIndex + 1}
+            stepTotal={steps.length}
+            canPrev={canGoPrevStep}
+            canNext={canGoNextStep}
+            onPrev={goPrevStep}
+            onNext={goNextStep}
+          />
+
           <PlayTabBar
             tabs={TAB_CONFIG}
             active={activeTab}
             onChange={(key) => {
-              setActiveTab(key as typeof activeTab);
+              setActiveTab(key as ActiveTab);
               if (key !== "clue") setMessage(null);
             }}
+            className="mt-2.5"
           />
 
           <div className="mt-2 space-y-2.5">

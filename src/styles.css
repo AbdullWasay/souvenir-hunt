@@ -272,6 +272,10 @@
   /* Home page — fixed cityscape background (content scrolls over it) */
   .home-scene {
     position: fixed;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
   @media (max-width: 767px) {
     .home-illustration-wrap {
@@ -308,6 +312,24 @@
   }
   .play-mobile .scrollbar-none::-webkit-scrollbar {
     display: none;
+  }
+
+  /* iOS Safari — play hunt stability */
+  @supports (-webkit-touch-callout: none) {
+    .play-mobile {
+      min-height: -webkit-fill-available;
+    }
+    .play-mobile input,
+    .play-mobile textarea,
+    .play-mobile select {
+      font-size: 16px;
+    }
+    .play-mobile button {
+      -webkit-tap-highlight-color: transparent;
+    }
+  }
+  .play-mobile-inner {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
   }
 
   /* Entrance + scroll reveal (no JS required for enter-anim) */

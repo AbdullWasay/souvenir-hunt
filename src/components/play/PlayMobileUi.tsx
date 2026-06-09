@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { MapPin } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { SiteCityscapeBg } from "@/components/site/SiteCityscapeBg";
 
 export function PlayMobileShell({
@@ -10,7 +10,7 @@ export function PlayMobileShell({
   className?: string;
 }) {
   return (
-    <div className={`play-mobile relative isolate min-h-[100dvh] overflow-x-hidden ${className}`}>
+    <div className={`play-mobile relative isolate min-h-[100dvh] overflow-x-hidden overscroll-y-none ${className}`}>
       <SiteCityscapeBg />
       <div className="play-mobile-inner relative z-[1] mx-auto flex w-full max-w-[420px] flex-col gap-2 px-4 py-2 sm:gap-3 sm:px-5 sm:py-4">
         {children}
@@ -240,7 +240,7 @@ export function PlayProgressBanner({
       <p className="font-mono text-[8px] uppercase tracking-[0.16em] text-white/55">
         {huntName} · {gameId}
       </p>
-      <h2 className="mx-auto mt-1 line-clamp-2 max-w-[320px] font-display text-[0.98rem] font-semibold leading-snug text-white">
+      <h2 className="mx-auto mt-1 line-clamp-2 max-w-[340px] font-display text-[1.2rem] font-semibold leading-[1.15] text-white sm:text-[1.28rem]">
         {stepTitle}
       </h2>
       {location && (
@@ -335,6 +335,48 @@ export function PlayLinkBtn({
   );
 }
 
+export function PlayStepNav({
+  stepNumber,
+  stepTotal,
+  canPrev,
+  canNext,
+  onPrev,
+  onNext,
+}: {
+  stepNumber: number;
+  stepTotal: number;
+  canPrev: boolean;
+  canNext: boolean;
+  onPrev: () => void;
+  onNext: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <button
+        type="button"
+        onClick={onPrev}
+        disabled={!canPrev}
+        aria-label="Previous stop"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-white text-primary shadow-sm transition-opacity disabled:opacity-30 touch-manipulation active:scale-95"
+      >
+        <ChevronLeft className="h-5 w-5" strokeWidth={2.25} />
+      </button>
+      <p className="min-w-0 flex-1 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+        Stop {stepNumber} <span className="text-primary/45">/</span> {stepTotal}
+      </p>
+      <button
+        type="button"
+        onClick={onNext}
+        disabled={!canNext}
+        aria-label="Next stop"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-white text-primary shadow-sm transition-opacity disabled:opacity-30 touch-manipulation active:scale-95"
+      >
+        <ChevronRight className="h-5 w-5" strokeWidth={2.25} />
+      </button>
+    </div>
+  );
+}
+
 export function PlayTabBar({
   tabs,
   active,
@@ -347,7 +389,7 @@ export function PlayTabBar({
   className?: string;
 }) {
   return (
-    <div className={`grid grid-cols-4 gap-0.5 rounded-full border border-primary/15 bg-primary/8 p-0.5 ${className}`}>
+    <div className={`grid grid-cols-3 gap-0.5 rounded-full border border-primary/15 bg-primary/8 p-0.5 ${className}`}>
       {tabs.map(({ key, label }) => (
         <button
           key={key}
