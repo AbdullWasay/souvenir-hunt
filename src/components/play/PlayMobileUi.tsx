@@ -10,8 +10,8 @@ export function PlayMobileShell({
   className?: string;
 }) {
   return (
-    <div className={`play-mobile relative ${className}`}>
-      <SiteCityscapeBg />
+    <div className={`play-mobile relative min-h-full ${className}`}>
+      <SiteCityscapeBg attachment="scroll" />
       <div className="play-mobile-inner relative z-[1] mx-auto flex w-full max-w-[420px] flex-col gap-2 px-4 py-2 sm:gap-3 sm:px-5 sm:py-4">
         {children}
       </div>

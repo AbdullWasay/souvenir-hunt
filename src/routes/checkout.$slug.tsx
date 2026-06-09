@@ -55,7 +55,7 @@ function CheckoutPage() {
 
   return (
     <div className="relative isolate pb-20">
-      <SiteCityscapeBg />
+      <SiteCityscapeBg attachment="scroll" />
       <div className="relative z-[1]">
       {/* Top banner */}
       <section className="relative overflow-hidden border-b border-border/60">

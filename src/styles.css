@@ -269,17 +269,25 @@
   @keyframes spin-slow { to { transform: rotate(360deg); } }
   .spin-slow { animation: spin-slow 24s linear infinite; }
 
-  /* Home page — fixed cityscape background (content scrolls over it) */
-  .home-scene {
-    position: fixed;
+  /* Cityscape background — fixed on home, scroll-attached on play/checkout */
+  .home-scene-fixed {
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
-  @media (max-width: 767px) {
+  .home-scene-scroll {
+    height: 100%;
+  }
+  /* Mobile + iOS: skip embedded-raster SVG (Safari shows black rects around balloons) */
+  .home-scene-mobile-fallback {
+    background:
+      linear-gradient(180deg, #f0f5ff 0%, #e6eefc 55%, #dce8fa 100%),
+      radial-gradient(ellipse 90% 45% at 50% 100%, rgba(160, 190, 230, 0.28) 0%, transparent 72%);
+  }
+  @media (min-width: 768px) {
     .home-illustration-wrap {
-      transform: translateY(12%);
+      transform: translateY(4%);
     }
   }
   .hero-kpi-scroll {
@@ -323,16 +331,14 @@
     display: none;
   }
 
-  /* iOS Safari — smooth document scroll on play + parallax pages */
+  /* iOS Safari — smooth document scroll on play pages */
   @supports (-webkit-touch-callout: none) {
-    html:has(.play-mobile),
-    html:has(.home-page) {
+    html:has(.play-mobile) {
       height: auto;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
-    body:has(.play-mobile),
-    body.home-parallax-active {
+    body:has(.play-mobile) {
       height: auto;
       min-height: 100%;
       overflow-x: hidden;
