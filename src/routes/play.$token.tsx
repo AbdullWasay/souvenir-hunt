@@ -410,12 +410,12 @@ function PlayPage() {
             ].map((item, index) => (
               <div
                 key={item.title}
-                className="glass flex items-center gap-3 rounded-2xl border border-white/80 px-4 py-3"
+                className="glass flex items-start gap-3 rounded-2xl border border-white/80 px-4 py-3"
               >
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-semibold text-white">
                   {index + 1}
                 </span>
-                <div className="min-w-0 flex-1 text-center sm:text-left">
+                <div className="min-w-0 flex-1 text-left">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-primary">{item.title}</p>
                   <p className="mt-0.5 text-[0.8rem] leading-snug text-foreground/75">{item.body}</p>
                 </div>
