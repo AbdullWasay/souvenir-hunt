@@ -279,11 +279,10 @@
   .home-scene-scroll {
     height: 100%;
   }
-  /* Mobile + iOS: skip embedded-raster SVG (Safari shows black rects around balloons) */
-  .home-scene-mobile-fallback {
-    background:
-      linear-gradient(180deg, #f0f5ff 0%, #e6eefc 55%, #dce8fa 100%),
-      radial-gradient(ellipse 90% 45% at 50% 100%, rgba(160, 190, 230, 0.28) 0%, transparent 72%);
+  @media (max-width: 767px) {
+    .home-illustration-wrap {
+      transform: translateY(12%);
+    }
   }
   @media (min-width: 768px) {
     .home-illustration-wrap {

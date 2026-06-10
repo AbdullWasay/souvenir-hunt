@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const CITYSCAPE_BG = "/assets/branding/background-static.svg";
+const CITYSCAPE_BG = "/assets/branding/background-static.webp";
 
 type SiteCityscapeBgProps = {
   /** fixed = stays put while content scrolls (home). scroll = moves with page (play, checkout). */
@@ -24,12 +24,9 @@ export function SiteCityscapeBg({ attachment = "fixed" }: SiteCityscapeBgProps) 
       className={`${sceneClass} pointer-events-none z-0 overflow-hidden bg-[#f0f5ff]`}
       aria-hidden
     >
-      {/* iOS-safe fallback — SVG embeds raster images with filters that Safari renders as black boxes */}
-      <div className="home-scene-mobile-fallback absolute inset-0 md:hidden" />
-
       <div className="home-layer-sky absolute inset-x-0 top-0 z-[2] h-[min(70vh,560px)] bg-gradient-to-b from-[#f0f5ff] from-40% via-[#f0f5ff]/88 via-65% to-transparent" />
 
-      <div className="home-illustration-wrap absolute inset-x-0 bottom-0 z-[1] hidden w-full justify-center md:flex">
+      <div className="home-illustration-wrap absolute inset-x-0 bottom-0 z-[1] flex w-full justify-center">
         <img
           src={CITYSCAPE_BG}
           alt=""
