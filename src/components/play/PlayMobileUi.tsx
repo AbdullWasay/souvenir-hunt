@@ -10,8 +10,8 @@ export function PlayMobileShell({
   className?: string;
 }) {
   return (
-    <div className={`play-mobile relative min-h-full ${className}`}>
-      <SiteCityscapeBg attachment="scroll" />
+    <div className={`play-mobile relative isolate min-h-[100svh] overflow-x-hidden ${className}`}>
+      <SiteCityscapeBg fixed={false} />
       <div className="play-mobile-inner relative z-[1] mx-auto flex w-full max-w-[420px] flex-col gap-2 px-4 py-2 sm:gap-3 sm:px-5 sm:py-4">
         {children}
       </div>
@@ -210,12 +210,12 @@ export function PlayProgressBanner({
   stepTitle,
   location,
   progressPct,
-  total,
-  current,
-  completedIds,
-  stepIds,
-  viewing,
-  onSelect,
+  stepNumber,
+  stepTotal,
+  canPrevStep,
+  canNextStep,
+  onPrevStep,
+  onNextStep,
   embedded = false,
 }: {
   gameId: string;
@@ -223,12 +223,12 @@ export function PlayProgressBanner({
   stepTitle: string;
   location?: string;
   progressPct: number;
-  total: number;
-  current: number;
-  completedIds: string[];
-  stepIds: string[];
-  viewing: number;
-  onSelect: (i: number) => void;
+  stepNumber: number;
+  stepTotal: number;
+  canPrevStep: boolean;
+  canNextStep: boolean;
+  onPrevStep: () => void;
+  onNextStep: () => void;
   embedded?: boolean;
 }) {
   return (
@@ -240,7 +240,7 @@ export function PlayProgressBanner({
       <p className="font-mono text-[8px] uppercase tracking-[0.16em] text-white/55">
         {huntName} · {gameId}
       </p>
-      <h2 className="mx-auto mt-1 line-clamp-2 max-w-[340px] font-display text-[1.2rem] font-semibold leading-[1.15] text-white sm:text-[1.28rem]">
+      <h2 className="mx-auto mt-1 line-clamp-2 max-w-[320px] font-display text-[1.2rem] font-semibold leading-snug text-white sm:text-[1.28rem]">
         {stepTitle}
       </h2>
       {location && (
@@ -262,16 +262,75 @@ export function PlayProgressBanner({
         </span>
       </div>
 
-      <PlayStepStrip
+      <PlayStepNav
         theme="light"
-        className="mt-1.5"
-        total={total}
-        current={current}
-        completedIds={completedIds}
-        stepIds={stepIds}
-        viewing={viewing}
-        onSelect={onSelect}
+        stepNumber={stepNumber}
+        stepTotal={stepTotal}
+        canPrev={canPrevStep}
+        canNext={canNextStep}
+        onPrev={onPrevStep}
+        onNext={onNextStep}
       />
+    </div>
+  );
+}
+
+export function PlayStepNav({
+  stepNumber,
+  stepTotal,
+  canPrev,
+  canNext,
+  onPrev,
+  onNext,
+  theme = "light",
+}: {
+  stepNumber: number;
+  stepTotal: number;
+  canPrev: boolean;
+  canNext: boolean;
+  onPrev: () => void;
+  onNext: () => void;
+  theme?: "light" | "default";
+}) {
+  const light = theme === "light";
+
+  return (
+    <div className={`mt-2 flex items-center justify-between gap-2 ${light ? "" : "px-1"}`}>
+      <button
+        type="button"
+        onClick={onPrev}
+        disabled={!canPrev}
+        aria-label="Previous stop"
+        className={`flex h-9 min-w-[4.5rem] flex-1 items-center justify-center gap-0.5 rounded-full text-xs font-semibold touch-manipulation transition-opacity disabled:opacity-30 ${
+          light
+            ? "border border-white/25 bg-white/10 text-white"
+            : "border border-border bg-white text-ink"
+        }`}
+      >
+        <ChevronLeft className="h-4 w-4 shrink-0" />
+        Prev
+      </button>
+      <span
+        className={`shrink-0 px-1 font-mono text-[11px] font-semibold tabular-nums ${
+          light ? "text-white/90" : "text-primary"
+        }`}
+      >
+        {stepNumber}/{stepTotal}
+      </span>
+      <button
+        type="button"
+        onClick={onNext}
+        disabled={!canNext}
+        aria-label="Next stop"
+        className={`flex h-9 min-w-[4.5rem] flex-1 items-center justify-center gap-0.5 rounded-full text-xs font-semibold touch-manipulation transition-opacity disabled:opacity-30 ${
+          light
+            ? "border border-white/25 bg-white/10 text-white"
+            : "border border-border bg-white text-ink"
+        }`}
+      >
+        Next
+        <ChevronRight className="h-4 w-4 shrink-0" />
+      </button>
     </div>
   );
 }
@@ -335,48 +394,6 @@ export function PlayLinkBtn({
   );
 }
 
-export function PlayStepNav({
-  stepNumber,
-  stepTotal,
-  canPrev,
-  canNext,
-  onPrev,
-  onNext,
-}: {
-  stepNumber: number;
-  stepTotal: number;
-  canPrev: boolean;
-  canNext: boolean;
-  onPrev: () => void;
-  onNext: () => void;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-2">
-      <button
-        type="button"
-        onClick={onPrev}
-        disabled={!canPrev}
-        aria-label="Previous stop"
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-white text-primary shadow-sm transition-opacity disabled:opacity-30 touch-manipulation active:scale-95"
-      >
-        <ChevronLeft className="h-5 w-5" strokeWidth={2.25} />
-      </button>
-      <p className="min-w-0 flex-1 text-center font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
-        Stop {stepNumber} <span className="text-primary/45">/</span> {stepTotal}
-      </p>
-      <button
-        type="button"
-        onClick={onNext}
-        disabled={!canNext}
-        aria-label="Next stop"
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-white text-primary shadow-sm transition-opacity disabled:opacity-30 touch-manipulation active:scale-95"
-      >
-        <ChevronRight className="h-5 w-5" strokeWidth={2.25} />
-      </button>
-    </div>
-  );
-}
-
 export function PlayTabBar({
   tabs,
   active,
@@ -389,7 +406,10 @@ export function PlayTabBar({
   className?: string;
 }) {
   return (
-    <div className={`grid grid-cols-3 gap-0.5 rounded-full border border-primary/15 bg-primary/8 p-0.5 ${className}`}>
+    <div
+      className={`grid gap-0.5 rounded-full border border-primary/15 bg-primary/8 p-0.5 ${className}`}
+      style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
+    >
       {tabs.map(({ key, label }) => (
         <button
           key={key}
@@ -492,12 +512,10 @@ type PlayActiveSessionProps = {
   stepTitle: string;
   location?: string;
   progressPct: number;
-  total: number;
-  current: number;
-  completedIds: string[];
-  stepIds: string[];
-  viewing: number;
-  onSelect: (i: number) => void;
+  canPrevStep: boolean;
+  canNextStep: boolean;
+  onPrevStep: () => void;
+  onNextStep: () => void;
   heroImage: string;
   heroLabel: string;
   children: ReactNode;
@@ -512,12 +530,10 @@ export function PlayActiveSession({
   stepTitle,
   location,
   progressPct,
-  total,
-  current,
-  completedIds,
-  stepIds,
-  viewing,
-  onSelect,
+  canPrevStep,
+  canNextStep,
+  onPrevStep,
+  onNextStep,
   heroImage,
   heroLabel,
   children,
@@ -538,12 +554,12 @@ export function PlayActiveSession({
         stepTitle={stepTitle}
         location={location}
         progressPct={progressPct}
-        total={total}
-        current={current}
-        completedIds={completedIds}
-        stepIds={stepIds}
-        viewing={viewing}
-        onSelect={onSelect}
+        stepNumber={stepNumber}
+        stepTotal={stepTotal}
+        canPrevStep={canPrevStep}
+        canNextStep={canNextStep}
+        onPrevStep={onPrevStep}
+        onNextStep={onNextStep}
       />
       <div className="bg-gradient-to-b from-white to-blue-50/25 p-3">{children}</div>
     </article>

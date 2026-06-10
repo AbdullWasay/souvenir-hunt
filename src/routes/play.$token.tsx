@@ -21,7 +21,6 @@ import {
   PlayActiveSession,
   PlaySectionHeader,
   PlayStartCard,
-  PlayStepNav,
   PlayTabBar,
 } from "@/components/play/PlayMobileUi";
 import { getOrderByAccessToken, saveHuntProgress } from "@/server/checkout";
@@ -109,9 +108,9 @@ function initialPhase(
 
 const HUNT_IMAGE_FALLBACK = "/assets/branding/split-hunt-image.svg";
 
-type ActiveTab = "guide" | "story" | "clue";
+type PlayTab = "guide" | "story" | "clue";
 
-const TAB_CONFIG: { key: ActiveTab; label: string }[] = [
+const TAB_CONFIG: { key: PlayTab; label: string }[] = [
   { key: "guide", label: "Guide" },
   { key: "story", label: "Story" },
   { key: "clue", label: "Clue" },
@@ -158,7 +157,7 @@ function PlayPage() {
     resolveInitialStepIndex(steps.length, progress, order.accessToken),
   );
   const [completed, setCompleted] = useState<string[]>(progress.completedStepIds);
-  const [activeTab, setActiveTab] = useState<ActiveTab>("guide");
+  const [activeTab, setActiveTab] = useState<PlayTab>("guide");
   const [answer, setAnswer] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [closed, setClosed] = useState(Boolean(progress.closedAt));
@@ -221,16 +220,16 @@ function PlayPage() {
     setMessage(null);
   }
 
-  function goPrevStep() {
+  function goToPrevStep() {
     goToStep(viewIndex - 1);
   }
 
-  function goNextStep() {
+  function goToNextStep() {
     goToStep(viewIndex + 1);
   }
 
-  const canGoPrevStep = viewIndex > 0;
-  const canGoNextStep = viewIndex < stepIndex;
+  const canPrevStep = viewIndex > 0;
+  const canNextStep = viewIndex < stepIndex && viewIndex < steps.length - 1;
 
   function goPrevTab() {
     if (activeTabIndex <= 0) return;
@@ -440,6 +439,7 @@ function PlayPage() {
 
   return (
     <PlayMobileShell>
+      <Reveal>
       <PlayActiveSession
         gameId={gameId}
         huntName={hunt.name}
@@ -448,32 +448,20 @@ function PlayPage() {
         stepTitle={step?.title ?? `Stop ${viewIndex + 1}`}
         location={step?.location}
         progressPct={progressPct}
-        total={steps.length}
-        current={stepIndex}
-        completedIds={completed}
-        stepIds={steps.map((s) => s.id)}
-        viewing={viewIndex}
-        onSelect={goToStep}
+        canPrevStep={canPrevStep}
+        canNextStep={canNextStep}
+        onPrevStep={goToPrevStep}
+        onNextStep={goToNextStep}
         heroImage={stepImage}
         heroLabel={activeTabLabel}
       >
-          <PlayStepNav
-            stepNumber={viewIndex + 1}
-            stepTotal={steps.length}
-            canPrev={canGoPrevStep}
-            canNext={canGoNextStep}
-            onPrev={goPrevStep}
-            onNext={goNextStep}
-          />
-
           <PlayTabBar
             tabs={TAB_CONFIG}
             active={activeTab}
             onChange={(key) => {
-              setActiveTab(key as ActiveTab);
+              setActiveTab(key as PlayTab);
               if (key !== "clue") setMessage(null);
             }}
-            className="mt-2.5"
           />
 
           <div className="mt-2 space-y-2.5">
@@ -587,6 +575,7 @@ function PlayPage() {
             </p>
           )}
       </PlayActiveSession>
+      </Reveal>
     </PlayMobileShell>
   );
 }

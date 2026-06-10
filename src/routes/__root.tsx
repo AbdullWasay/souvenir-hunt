@@ -54,7 +54,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Souvenir Hunt — Self-guided city hunts with a keepsake" },
       { name: "description", content: "A clean self-guided city hunt with hidden stories, playful clues, and a keepsake at the end." },
       { property: "og:title", content: "Souvenir Hunt" },
@@ -112,7 +112,7 @@ function RootComponent() {
           hideChrome
             ? "relative z-10 isolate min-h-screen"
             : isPlay
-              ? "relative z-10 pt-[5.5rem] sm:pt-28"
+              ? "relative z-10 pt-[5.5rem] sm:pt-28 isolate"
               : "relative z-10 pt-28 isolate"
         }
       >

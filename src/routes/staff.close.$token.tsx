@@ -34,7 +34,7 @@ function StaffClosePage() {
 
   return (
     <div className="relative isolate flex min-h-screen flex-col items-center justify-center px-4 py-12">
-      <SiteCityscapeBg attachment="scroll" />
+      <SiteCityscapeBg />
       <div className="relative z-[1] flex w-full max-w-md flex-col items-center">
       <div className="mb-8 flex flex-col items-center gap-3 sm:mb-10">
         <div className="flex items-center gap-3">

@@ -269,24 +269,27 @@
   @keyframes spin-slow { to { transform: rotate(360deg); } }
   .spin-slow { animation: spin-slow 24s linear infinite; }
 
-  /* Cityscape background — fixed on home, scroll-attached on play/checkout */
-  .home-scene-fixed {
+  /* Cityscape background — hardware layer helps iOS Safari */
+  .home-scene {
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
-  .home-scene-scroll {
-    height: 100%;
+
+  /* Play hunt — iOS touch & scroll polish */
+  .play-mobile {
+    -webkit-overflow-scrolling: touch;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .play-mobile input,
+  .play-mobile textarea,
+  .play-mobile select {
+    font-size: 16px;
   }
   @media (max-width: 767px) {
     .home-illustration-wrap {
       transform: translateY(12%);
-    }
-  }
-  @media (min-width: 768px) {
-    .home-illustration-wrap {
-      transform: translateY(4%);
     }
   }
   .hero-kpi-scroll {
@@ -313,45 +316,12 @@
     will-change: transform;
     transform: translate3d(0, calc(var(--play-scroll) * 0.06), 0);
   }
-  /* Play hunt — mobile scroll (document scroll, not trapped inner panel) */
-  .play-mobile {
-    overflow: visible;
-    touch-action: pan-y;
-  }
-  .play-mobile-inner {
-    overflow: visible;
-    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-  }
   .play-mobile .scrollbar-none {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
   .play-mobile .scrollbar-none::-webkit-scrollbar {
     display: none;
-  }
-
-  /* iOS Safari — smooth document scroll on play pages */
-  @supports (-webkit-touch-callout: none) {
-    html:has(.play-mobile) {
-      height: auto;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    body:has(.play-mobile) {
-      height: auto;
-      min-height: 100%;
-      overflow-x: hidden;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .play-mobile input,
-    .play-mobile textarea,
-    .play-mobile select {
-      font-size: 16px;
-    }
-    .play-mobile button {
-      -webkit-tap-highlight-color: transparent;
-    }
   }
 
   /* Entrance + scroll reveal (no JS required for enter-anim) */

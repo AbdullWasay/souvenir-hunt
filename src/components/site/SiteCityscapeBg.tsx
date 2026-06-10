@@ -1,27 +1,24 @@
 import { useEffect } from "react";
 
-const CITYSCAPE_BG = "/assets/branding/background-static.webp";
+const CITYSCAPE_BG = "/assets/branding/background-static.svg";
 
-type SiteCityscapeBgProps = {
-  /** fixed = stays put while content scrolls (home). scroll = moves with page (play, checkout). */
-  attachment?: "fixed" | "scroll";
+type Props = {
+  /** Use absolute on play pages — avoids iOS Safari fixed-position scroll bugs. */
+  fixed?: boolean;
 };
 
-/** Fixed or scroll cityscape background — light sky + illustrated skyline. */
-export function SiteCityscapeBg({ attachment = "fixed" }: SiteCityscapeBgProps) {
+/** Cityscape background — fixed on marketing pages, absolute on play. */
+export function SiteCityscapeBg({ fixed = true }: Props) {
   useEffect(() => {
     document.body.classList.add("home-parallax-active");
     return () => document.body.classList.remove("home-parallax-active");
   }, []);
 
-  const sceneClass =
-    attachment === "fixed"
-      ? "home-scene home-scene-fixed fixed inset-0"
-      : "home-scene home-scene-scroll absolute inset-x-0 top-0 min-h-full";
-
   return (
     <div
-      className={`${sceneClass} pointer-events-none z-0 overflow-hidden bg-[#f0f5ff]`}
+      className={`home-scene pointer-events-none z-0 overflow-hidden bg-[#f0f5ff] ${
+        fixed ? "fixed inset-0" : "absolute inset-0 min-h-full"
+      }`}
       aria-hidden
     >
       <div className="home-layer-sky absolute inset-x-0 top-0 z-[2] h-[min(70vh,560px)] bg-gradient-to-b from-[#f0f5ff] from-40% via-[#f0f5ff]/88 via-65% to-transparent" />
@@ -33,7 +30,6 @@ export function SiteCityscapeBg({ attachment = "fixed" }: SiteCityscapeBgProps) 
           className="home-layer-back block h-auto w-full min-w-full max-w-[1440px]"
           width={1440}
           height={810}
-          decoding="async"
         />
       </div>
     </div>
