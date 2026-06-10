@@ -108,12 +108,11 @@ function initialPhase(
 
 const HUNT_IMAGE_FALLBACK = "/assets/branding/split-hunt-image.svg";
 
-type PlayTab = "guide" | "story" | "clue";
-
-const TAB_CONFIG: { key: PlayTab; label: string }[] = [
-  { key: "guide", label: "Guide" },
-  { key: "story", label: "Story" },
-  { key: "clue", label: "Clue" },
+const TAB_CONFIG = [
+  { key: "story" as const, label: "Story" },
+  { key: "history" as const, label: "History" },
+  { key: "clue" as const, label: "Clue" },
+  { key: "guide" as const, label: "Guide" },
 ];
 
 function StepBody({ paragraphs, italic }: { paragraphs: string[]; italic?: boolean }) {
@@ -157,7 +156,7 @@ function PlayPage() {
     resolveInitialStepIndex(steps.length, progress, order.accessToken),
   );
   const [completed, setCompleted] = useState<string[]>(progress.completedStepIds);
-  const [activeTab, setActiveTab] = useState<PlayTab>("guide");
+  const [activeTab, setActiveTab] = useState<"story" | "history" | "clue" | "guide">("story");
   const [answer, setAnswer] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [closed, setClosed] = useState(Boolean(progress.closedAt));
@@ -216,20 +215,9 @@ function PlayPage() {
   function goToStep(index: number) {
     if (index < 0 || index > stepIndex || index >= steps.length) return;
     setViewIndex(index);
-    setActiveTab("guide");
+    setActiveTab("story");
     setMessage(null);
   }
-
-  function goToPrevStep() {
-    goToStep(viewIndex - 1);
-  }
-
-  function goToNextStep() {
-    goToStep(viewIndex + 1);
-  }
-
-  const canPrevStep = viewIndex > 0;
-  const canNextStep = viewIndex < stepIndex && viewIndex < steps.length - 1;
 
   function goPrevTab() {
     if (activeTabIndex <= 0) return;
@@ -286,7 +274,7 @@ function PlayPage() {
       setAnswer("");
       setMessage(nextIndex >= steps.length ? "Hunt complete!" : "Correct. Next clue unlocked.");
       setRevealedHints(0);
-      setActiveTab("guide");
+      setActiveTab("story");
       setPhase("playing");
       await persist(nextIndex, nextCompleted, { introCompleted: true, revealedHints: 0 });
     } else {
@@ -397,16 +385,17 @@ function PlayPage() {
           imageUrl={stepImage}
           label={`Game · ${gameId}`}
           title={hunt.name}
-          hint="Guide, story & clue on each stop."
+          hint="Story, history, clue & guide on each stop."
         />
         </Reveal>
 
         <Reveal delay={0.06}>
         <div className="space-y-2.5">
             {[
-              { title: "Guide", body: "How to observe the space calmly." },
               { title: "Story", body: "Mood and mystery at each stop." },
+              { title: "History", body: "Real background of where you stand." },
               { title: "Clue", body: "What to find and the riddle to solve." },
+              { title: "Guide", body: "How to observe the space calmly." },
             ].map((item, index) => (
               <div
                 key={item.title}
@@ -448,10 +437,12 @@ function PlayPage() {
         stepTitle={step?.title ?? `Stop ${viewIndex + 1}`}
         location={step?.location}
         progressPct={progressPct}
-        canPrevStep={canPrevStep}
-        canNextStep={canNextStep}
-        onPrevStep={goToPrevStep}
-        onNextStep={goToNextStep}
+        total={steps.length}
+        current={stepIndex}
+        completedIds={completed}
+        stepIds={steps.map((s) => s.id)}
+        viewing={viewIndex}
+        onSelect={goToStep}
         heroImage={stepImage}
         heroLabel={activeTabLabel}
       >
@@ -459,7 +450,7 @@ function PlayPage() {
             tabs={TAB_CONFIG}
             active={activeTab}
             onChange={(key) => {
-              setActiveTab(key as PlayTab);
+              setActiveTab(key as typeof activeTab);
               if (key !== "clue") setMessage(null);
             }}
           />

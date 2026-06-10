@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { SiteCityscapeBg } from "@/components/site/SiteCityscapeBg";
 
 export function PlayMobileShell({
@@ -10,8 +10,8 @@ export function PlayMobileShell({
   className?: string;
 }) {
   return (
-    <div className={`play-mobile relative isolate min-h-[100svh] overflow-x-hidden ${className}`}>
-      <SiteCityscapeBg fixed={false} />
+    <div className={`play-mobile relative isolate min-h-[100dvh] overflow-x-hidden ${className}`}>
+      <SiteCityscapeBg />
       <div className="play-mobile-inner relative z-[1] mx-auto flex w-full max-w-[420px] flex-col gap-2 px-4 py-2 sm:gap-3 sm:px-5 sm:py-4">
         {children}
       </div>
@@ -210,12 +210,12 @@ export function PlayProgressBanner({
   stepTitle,
   location,
   progressPct,
-  stepNumber,
-  stepTotal,
-  canPrevStep,
-  canNextStep,
-  onPrevStep,
-  onNextStep,
+  total,
+  current,
+  completedIds,
+  stepIds,
+  viewing,
+  onSelect,
   embedded = false,
 }: {
   gameId: string;
@@ -223,12 +223,12 @@ export function PlayProgressBanner({
   stepTitle: string;
   location?: string;
   progressPct: number;
-  stepNumber: number;
-  stepTotal: number;
-  canPrevStep: boolean;
-  canNextStep: boolean;
-  onPrevStep: () => void;
-  onNextStep: () => void;
+  total: number;
+  current: number;
+  completedIds: string[];
+  stepIds: string[];
+  viewing: number;
+  onSelect: (i: number) => void;
   embedded?: boolean;
 }) {
   return (
@@ -240,7 +240,7 @@ export function PlayProgressBanner({
       <p className="font-mono text-[8px] uppercase tracking-[0.16em] text-white/55">
         {huntName} · {gameId}
       </p>
-      <h2 className="mx-auto mt-1 line-clamp-2 max-w-[320px] font-display text-[1.2rem] font-semibold leading-snug text-white sm:text-[1.28rem]">
+      <h2 className="mx-auto mt-1 line-clamp-2 max-w-[320px] font-display text-[0.98rem] font-semibold leading-snug text-white">
         {stepTitle}
       </h2>
       {location && (
@@ -262,75 +262,16 @@ export function PlayProgressBanner({
         </span>
       </div>
 
-      <PlayStepNav
+      <PlayStepStrip
         theme="light"
-        stepNumber={stepNumber}
-        stepTotal={stepTotal}
-        canPrev={canPrevStep}
-        canNext={canNextStep}
-        onPrev={onPrevStep}
-        onNext={onNextStep}
+        className="mt-1.5"
+        total={total}
+        current={current}
+        completedIds={completedIds}
+        stepIds={stepIds}
+        viewing={viewing}
+        onSelect={onSelect}
       />
-    </div>
-  );
-}
-
-export function PlayStepNav({
-  stepNumber,
-  stepTotal,
-  canPrev,
-  canNext,
-  onPrev,
-  onNext,
-  theme = "light",
-}: {
-  stepNumber: number;
-  stepTotal: number;
-  canPrev: boolean;
-  canNext: boolean;
-  onPrev: () => void;
-  onNext: () => void;
-  theme?: "light" | "default";
-}) {
-  const light = theme === "light";
-
-  return (
-    <div className={`mt-2 flex items-center justify-between gap-2 ${light ? "" : "px-1"}`}>
-      <button
-        type="button"
-        onClick={onPrev}
-        disabled={!canPrev}
-        aria-label="Previous stop"
-        className={`flex h-9 min-w-[4.5rem] flex-1 items-center justify-center gap-0.5 rounded-full text-xs font-semibold touch-manipulation transition-opacity disabled:opacity-30 ${
-          light
-            ? "border border-white/25 bg-white/10 text-white"
-            : "border border-border bg-white text-ink"
-        }`}
-      >
-        <ChevronLeft className="h-4 w-4 shrink-0" />
-        Prev
-      </button>
-      <span
-        className={`shrink-0 px-1 font-mono text-[11px] font-semibold tabular-nums ${
-          light ? "text-white/90" : "text-primary"
-        }`}
-      >
-        {stepNumber}/{stepTotal}
-      </span>
-      <button
-        type="button"
-        onClick={onNext}
-        disabled={!canNext}
-        aria-label="Next stop"
-        className={`flex h-9 min-w-[4.5rem] flex-1 items-center justify-center gap-0.5 rounded-full text-xs font-semibold touch-manipulation transition-opacity disabled:opacity-30 ${
-          light
-            ? "border border-white/25 bg-white/10 text-white"
-            : "border border-border bg-white text-ink"
-        }`}
-      >
-        Next
-        <ChevronRight className="h-4 w-4 shrink-0" />
-      </button>
     </div>
   );
 }
@@ -406,10 +347,7 @@ export function PlayTabBar({
   className?: string;
 }) {
   return (
-    <div
-      className={`grid gap-0.5 rounded-full border border-primary/15 bg-primary/8 p-0.5 ${className}`}
-      style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
-    >
+    <div className={`grid grid-cols-4 gap-0.5 rounded-full border border-primary/15 bg-primary/8 p-0.5 ${className}`}>
       {tabs.map(({ key, label }) => (
         <button
           key={key}
@@ -512,10 +450,12 @@ type PlayActiveSessionProps = {
   stepTitle: string;
   location?: string;
   progressPct: number;
-  canPrevStep: boolean;
-  canNextStep: boolean;
-  onPrevStep: () => void;
-  onNextStep: () => void;
+  total: number;
+  current: number;
+  completedIds: string[];
+  stepIds: string[];
+  viewing: number;
+  onSelect: (i: number) => void;
   heroImage: string;
   heroLabel: string;
   children: ReactNode;
@@ -530,10 +470,12 @@ export function PlayActiveSession({
   stepTitle,
   location,
   progressPct,
-  canPrevStep,
-  canNextStep,
-  onPrevStep,
-  onNextStep,
+  total,
+  current,
+  completedIds,
+  stepIds,
+  viewing,
+  onSelect,
   heroImage,
   heroLabel,
   children,
@@ -554,12 +496,12 @@ export function PlayActiveSession({
         stepTitle={stepTitle}
         location={location}
         progressPct={progressPct}
-        stepNumber={stepNumber}
-        stepTotal={stepTotal}
-        canPrevStep={canPrevStep}
-        canNextStep={canNextStep}
-        onPrevStep={onPrevStep}
-        onNextStep={onNextStep}
+        total={total}
+        current={current}
+        completedIds={completedIds}
+        stepIds={stepIds}
+        viewing={viewing}
+        onSelect={onSelect}
       />
       <div className="bg-gradient-to-b from-white to-blue-50/25 p-3">{children}</div>
     </article>

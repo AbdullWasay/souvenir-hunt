@@ -269,23 +269,9 @@
   @keyframes spin-slow { to { transform: rotate(360deg); } }
   .spin-slow { animation: spin-slow 24s linear infinite; }
 
-  /* Cityscape background — hardware layer helps iOS Safari */
+  /* Home page — fixed cityscape background (content scrolls over it) */
   .home-scene {
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-  }
-
-  /* Play hunt — iOS touch & scroll polish */
-  .play-mobile {
-    -webkit-overflow-scrolling: touch;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .play-mobile input,
-  .play-mobile textarea,
-  .play-mobile select {
-    font-size: 16px;
+    position: fixed;
   }
   @media (max-width: 767px) {
     .home-illustration-wrap {
