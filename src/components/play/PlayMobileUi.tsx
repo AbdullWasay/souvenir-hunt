@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { MapPin } from "lucide-react";
 import { SiteCityscapeBg } from "@/components/site/SiteCityscapeBg";
 
@@ -9,8 +9,13 @@ export function PlayMobileShell({
   children: ReactNode;
   className?: string;
 }) {
+  useEffect(() => {
+    document.body.classList.add("play-route-active");
+    return () => document.body.classList.remove("play-route-active");
+  }, []);
+
   return (
-    <div className={`play-mobile relative isolate min-h-[100dvh] overflow-x-hidden ${className}`}>
+    <div className={`play-mobile relative min-h-[100dvh] overflow-x-hidden ${className}`}>
       <SiteCityscapeBg />
       <div className="play-mobile-inner relative z-[1] mx-auto flex w-full max-w-[420px] flex-col gap-2 px-4 py-2 sm:gap-3 sm:px-5 sm:py-4">
         {children}
@@ -73,11 +78,11 @@ export function PlayMediaFrame({
 
       {isScene ? (
         <>
-          <span className="absolute left-2.5 top-2.5 inline-flex items-center rounded-full border border-white/35 bg-black/30 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-white backdrop-blur-md">
+          <span className="absolute left-2.5 top-2.5 inline-flex items-center rounded-full border border-white/35 bg-black/45 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-white">
             {label}
           </span>
           {badgeRight && (
-            <span className="absolute right-2.5 top-2.5 inline-flex items-center rounded-full border border-white/35 bg-primary/80 px-2 py-0.5 font-mono text-[9px] font-semibold tabular-nums text-white backdrop-blur-md">
+            <span className="absolute right-2.5 top-2.5 inline-flex items-center rounded-full border border-white/35 bg-primary px-2 py-0.5 font-mono text-[9px] font-semibold tabular-nums text-white">
               {badgeRight}
             </span>
           )}
@@ -88,7 +93,7 @@ export function PlayMediaFrame({
             variant === "step" ? "pb-4 pt-16" : "pb-5 pt-20"
           }`}
         >
-          <span className="inline-flex items-center rounded-full border border-white/30 bg-white/15 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.22em] text-white/95 backdrop-blur-md">
+          <span className="inline-flex items-center rounded-full border border-white/30 bg-black/40 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.22em] text-white/95">
             {label}
           </span>
           {title && (
@@ -278,7 +283,7 @@ export function PlayProgressBanner({
 
 export function PlayGlassCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`glass rounded-2xl border border-white/90 px-4 py-4 shadow-paper ${className}`}>
+    <div className={`rounded-2xl border border-border/80 bg-white/95 px-4 py-4 shadow-paper ${className}`}>
       {children}
     </div>
   );

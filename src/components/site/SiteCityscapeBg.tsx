@@ -16,15 +16,10 @@ export function SiteCityscapeBg() {
     >
       <div className="home-layer-sky absolute inset-x-0 top-0 z-[2] h-[min(70vh,560px)] bg-gradient-to-b from-[#f0f5ff] from-40% via-[#f0f5ff]/88 via-65% to-transparent" />
 
-      <div className="home-illustration-wrap absolute inset-x-0 bottom-0 z-[1] flex w-full justify-center">
-        <img
-          src={CITYSCAPE_BG}
-          alt=""
-          className="home-layer-back block h-auto w-full min-w-full max-w-[1440px]"
-          width={1440}
-          height={810}
-        />
-      </div>
+      <div
+        className="home-illustration-wrap absolute inset-x-0 bottom-0 z-[1] h-[min(52vh,420px)] w-full bg-[#f0f5ff] bg-[length:100%_auto] bg-bottom bg-no-repeat"
+        style={{ backgroundImage: `url(${CITYSCAPE_BG})` }}
+      />
     </div>
   );
 }

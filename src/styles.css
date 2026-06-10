@@ -272,10 +272,32 @@
   /* Home page — fixed cityscape background (content scrolls over it) */
   .home-scene {
     position: fixed;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
-  @media (max-width: 767px) {
-    .home-illustration-wrap {
-      transform: translateY(12%);
+  .home-illustration-wrap {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  .site-logo-img {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  /* iOS Safari: backdrop-filter over masked SVGs causes black boxes + broken logo filters */
+  @supports (-webkit-touch-callout: none) {
+    body.play-route-active .site-header-bar {
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+      background-color: rgba(255, 255, 255, 0.96) !important;
+    }
+    .site-logo-img {
+      filter: none !important;
+      -webkit-filter: none !important;
+    }
+    .play-mobile [class*="backdrop-blur"] {
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
     }
   }
   .hero-kpi-scroll {

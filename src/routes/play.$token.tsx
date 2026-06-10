@@ -399,7 +399,7 @@ function PlayPage() {
             ].map((item, index) => (
               <div
                 key={item.title}
-                className="glass flex items-center gap-3 rounded-2xl border border-white/80 px-4 py-3"
+                className="flex items-center gap-3 rounded-2xl border border-border/70 bg-white/95 px-4 py-3 shadow-sm"
               >
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-semibold text-white">
                   {index + 1}

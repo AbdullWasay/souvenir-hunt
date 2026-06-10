@@ -3,6 +3,7 @@ import { useState } from "react";
 import { CheckCircle2, KeyRound, ShieldCheck } from "lucide-react";
 import { closeHuntProgress, getStaffCloseContext } from "@/server/checkout";
 import { SiteCityscapeBg } from "@/components/site/SiteCityscapeBg";
+import { SiteLogo } from "@/components/site/SiteLogo";
 
 export const Route = createFileRoute("/staff/close/$token")({
   loader: ({ params }) => getStaffCloseContext({ data: params.token }),
@@ -38,12 +39,7 @@ function StaffClosePage() {
       <div className="relative z-[1] flex w-full max-w-md flex-col items-center">
       <div className="mb-8 flex flex-col items-center gap-3 sm:mb-10">
         <div className="flex items-center gap-3">
-          <img
-            src="/assets/branding/logo-main.svg"
-            alt=""
-            aria-hidden
-            className="h-10 sm:h-12 w-auto shrink-0 object-contain [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(98%)_saturate(4688%)_hue-rotate(221deg)_brightness(101%)_contrast(103%)]"
-          />
+          <SiteLogo className="h-10 sm:h-12 w-auto shrink-0 object-contain" alt="" />
           <span className="font-display font-bold text-[1.35rem] sm:text-[1.65rem] leading-none text-primary tracking-tight">
             Souvenir Hunt
           </span>
