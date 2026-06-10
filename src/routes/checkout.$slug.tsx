@@ -54,7 +54,7 @@ function CheckoutPage() {
   const heroImage = hunt.heroImageUrl || HUNT_IMAGE_FALLBACK;
 
   return (
-    <div className="relative isolate pb-20">
+    <div className="relative w-full pb-20">
       <SiteCityscapeBg />
       <div className="relative z-[1]">
       {/* Top banner */}

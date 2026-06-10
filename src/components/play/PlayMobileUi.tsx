@@ -1,5 +1,5 @@
-import { useEffect, type ReactNode } from "react";
-import { MapPin } from "lucide-react";
+import type { ReactNode } from "react";
+import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { SiteCityscapeBg } from "@/components/site/SiteCityscapeBg";
 
 export function PlayMobileShell({
@@ -9,13 +9,8 @@ export function PlayMobileShell({
   children: ReactNode;
   className?: string;
 }) {
-  useEffect(() => {
-    document.body.classList.add("play-route-active");
-    return () => document.body.classList.remove("play-route-active");
-  }, []);
-
   return (
-    <div className={`play-mobile relative min-h-[100dvh] overflow-x-hidden ${className}`}>
+    <div className={`play-mobile relative w-full ${className}`}>
       <SiteCityscapeBg />
       <div className="play-mobile-inner relative z-[1] mx-auto flex w-full max-w-[420px] flex-col gap-2 px-4 py-2 sm:gap-3 sm:px-5 sm:py-4">
         {children}
@@ -78,11 +73,11 @@ export function PlayMediaFrame({
 
       {isScene ? (
         <>
-          <span className="absolute left-2.5 top-2.5 inline-flex items-center rounded-full border border-white/35 bg-black/45 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-white">
+          <span className="absolute left-2.5 top-2.5 inline-flex items-center rounded-full border border-white/35 bg-black/30 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-white backdrop-blur-md">
             {label}
           </span>
           {badgeRight && (
-            <span className="absolute right-2.5 top-2.5 inline-flex items-center rounded-full border border-white/35 bg-primary px-2 py-0.5 font-mono text-[9px] font-semibold tabular-nums text-white">
+            <span className="absolute right-2.5 top-2.5 inline-flex items-center rounded-full border border-white/35 bg-primary/80 px-2 py-0.5 font-mono text-[9px] font-semibold tabular-nums text-white backdrop-blur-md">
               {badgeRight}
             </span>
           )}
@@ -93,7 +88,7 @@ export function PlayMediaFrame({
             variant === "step" ? "pb-4 pt-16" : "pb-5 pt-20"
           }`}
         >
-          <span className="inline-flex items-center rounded-full border border-white/30 bg-black/40 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.22em] text-white/95">
+          <span className="inline-flex items-center rounded-full border border-white/30 bg-white/15 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.22em] text-white/95 backdrop-blur-md">
             {label}
           </span>
           {title && (
@@ -245,7 +240,7 @@ export function PlayProgressBanner({
       <p className="font-mono text-[8px] uppercase tracking-[0.16em] text-white/55">
         {huntName} · {gameId}
       </p>
-      <h2 className="mx-auto mt-1 line-clamp-2 max-w-[320px] font-display text-[0.98rem] font-semibold leading-snug text-white">
+      <h2 className="mx-auto mt-1.5 line-clamp-2 max-w-[340px] font-display text-[1.2rem] font-semibold leading-[1.15] text-white sm:text-[1.3rem]">
         {stepTitle}
       </h2>
       {location && (
@@ -283,7 +278,7 @@ export function PlayProgressBanner({
 
 export function PlayGlassCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-2xl border border-border/80 bg-white/95 px-4 py-4 shadow-paper ${className}`}>
+    <div className={`glass rounded-2xl border border-white/90 px-4 py-4 shadow-paper ${className}`}>
       {children}
     </div>
   );
@@ -340,6 +335,56 @@ export function PlayLinkBtn({
   );
 }
 
+export function PlayStepNav({
+  stepNumber,
+  stepTotal,
+  canGoPrev,
+  canGoNext,
+  onPrev,
+  onNext,
+  className = "",
+}: {
+  stepNumber: number;
+  stepTotal: number;
+  canGoPrev: boolean;
+  canGoNext: boolean;
+  onPrev: () => void;
+  onNext: () => void;
+  className?: string;
+}) {
+  return (
+    <div className={`flex items-center gap-2 ${className}`}>
+      <button
+        type="button"
+        onClick={onPrev}
+        disabled={!canGoPrev}
+        aria-label="Previous stop"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-white text-primary shadow-sm transition-colors disabled:opacity-35 touch-manipulation active:bg-primary/5"
+      >
+        <ChevronLeft className="h-5 w-5" strokeWidth={2.25} />
+      </button>
+
+      <div className="min-w-0 flex-1 text-center">
+        <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">Stop</p>
+        <p className="font-display text-[1.05rem] font-semibold leading-none text-ink tabular-nums">
+          {stepNumber}
+          <span className="text-muted-foreground/60"> / {stepTotal}</span>
+        </p>
+      </div>
+
+      <button
+        type="button"
+        onClick={onNext}
+        disabled={!canGoNext}
+        aria-label="Next stop"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-white text-primary shadow-sm transition-colors disabled:opacity-35 touch-manipulation active:bg-primary/5"
+      >
+        <ChevronRight className="h-5 w-5" strokeWidth={2.25} />
+      </button>
+    </div>
+  );
+}
+
 export function PlayTabBar({
   tabs,
   active,
@@ -351,8 +396,10 @@ export function PlayTabBar({
   onChange: (key: string) => void;
   className?: string;
 }) {
+  const cols = tabs.length === 3 ? "grid-cols-3" : tabs.length === 2 ? "grid-cols-2" : "grid-cols-4";
+
   return (
-    <div className={`grid grid-cols-4 gap-0.5 rounded-full border border-primary/15 bg-primary/8 p-0.5 ${className}`}>
+    <div className={`grid ${cols} gap-0.5 rounded-full border border-primary/15 bg-primary/8 p-0.5 ${className}`}>
       {tabs.map(({ key, label }) => (
         <button
           key={key}
@@ -490,7 +537,6 @@ export function PlayActiveSession({
       <PlayMediaFrame
         imageUrl={heroImage}
         label={heroLabel}
-        badgeRight={`${stepNumber}/${stepTotal}`}
         variant="scene"
         className="rounded-none"
       />

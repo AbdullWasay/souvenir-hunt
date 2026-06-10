@@ -26,7 +26,7 @@ function CheckoutSuccessPage() {
 
   if (!result.paid) {
     return (
-      <div className="relative isolate min-h-[70vh]">
+      <div className="relative w-full min-h-[70vh]">
         <SiteCityscapeBg />
         <div className="relative z-[1] mx-auto max-w-[420px] px-5 py-16 text-center sm:px-6 sm:py-20">
           <h1 className="font-display text-2xl text-ink">Payment pending</h1>
@@ -48,7 +48,7 @@ function CheckoutSuccessPage() {
   }
 
   return (
-    <div className="relative isolate min-h-[70vh]">
+    <div className="relative w-full min-h-[70vh]">
       <SiteCityscapeBg />
       <div className="relative z-[1] mx-auto max-w-[420px] px-5 py-12 sm:max-w-xl sm:px-6 sm:py-16 md:py-20">
       <Reveal className="flex flex-col items-center text-center">

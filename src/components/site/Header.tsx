@@ -2,7 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion, useScroll, useTransform, useSpring, useMotionTemplate } from "motion/react";
 import { Menu, X } from "lucide-react";
-import { SiteLogo } from "@/components/site/SiteLogo";
 
 type NavItem =
   | { kind: "hash"; label: string; hash: string }
@@ -86,7 +85,7 @@ export function Header() {
         }}
       >
         <motion.div
-          className="site-header-bar relative flex items-center justify-between gap-3 xl:gap-4"
+          className="relative flex items-center justify-between gap-3 xl:gap-4"
           style={{
             borderRadius: barRadius,
             paddingTop: barPaddingY,
@@ -111,7 +110,11 @@ export function Header() {
                 boxShadow: logoShadow,
               }}
             >
-              <SiteLogo />
+              <img
+                src="/assets/branding/logo-main.svg"
+                alt="Souvenir Hunt"
+                className="h-7 sm:h-9 w-auto shrink-0 object-contain [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(98%)_saturate(4688%)_hue-rotate(221deg)_brightness(101%)_contrast(103%)]"
+              />
               <span className="font-display font-bold text-[1.05rem] sm:text-[1.3rem] md:text-[1.45rem] leading-none text-primary tracking-tight whitespace-nowrap">
                 Souvenir Hunt
               </span>

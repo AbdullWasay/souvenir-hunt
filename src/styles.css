@@ -97,17 +97,37 @@
 
 @layer base {
   * { border-color: var(--color-border); }
-  html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+  html {
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+    overflow-x: clip;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
   body {
     background: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-body);
     background-image: var(--gradient-mesh);
     background-attachment: fixed;
+    overflow-x: clip;
+    min-height: 100%;
+    -webkit-overflow-scrolling: touch;
   }
   body.home-parallax-active {
     background: #f0f5ff;
     background-image: none;
+  }
+  /* Fixed backgrounds break momentum scroll on iOS — use scroll attachment on touch devices */
+  @media (max-width: 767px), (pointer: coarse) {
+    body {
+      background-attachment: scroll;
+    }
+    html,
+    body {
+      touch-action: pan-y;
+      overscroll-behavior-y: auto;
+    }
   }
   h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.03em; }
   ::selection { background: var(--color-primary); color: #fff; }
@@ -272,37 +292,32 @@
   /* Home page — fixed cityscape background (content scrolls over it) */
   .home-scene {
     position: fixed;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    touch-action: none;
   }
-  .home-illustration-wrap {
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
+  .play-mobile,
+  .home-page,
+  main {
+    touch-action: pan-y;
   }
-  .site-logo-img {
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+  .play-mobile button,
+  .play-mobile a {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
-
-  /* iOS Safari: backdrop-filter over masked SVGs causes black boxes + broken logo filters */
-  @supports (-webkit-touch-callout: none) {
-    body.play-route-active .site-header-bar {
-      -webkit-backdrop-filter: none !important;
-      backdrop-filter: none !important;
-      background-color: rgba(255, 255, 255, 0.96) !important;
-    }
-    .site-logo-img {
-      filter: none !important;
-      -webkit-filter: none !important;
-    }
-    .play-mobile [class*="backdrop-blur"] {
-      -webkit-backdrop-filter: none !important;
-      backdrop-filter: none !important;
+  .play-mobile input,
+  .play-mobile textarea {
+    font-size: 16px;
+  }
+  @media (max-width: 767px) {
+    .home-illustration-wrap {
+      transform: translateY(12%);
     }
   }
   .hero-kpi-scroll {
     -ms-overflow-style: none;
     scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
   }
   .hero-kpi-scroll::-webkit-scrollbar {
     display: none;

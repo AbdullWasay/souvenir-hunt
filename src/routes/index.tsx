@@ -31,7 +31,7 @@ export const Route = createFileRoute("/")({
 function Home() {
   const hunts = Route.useLoaderData();
   return (
-    <div className="home-page relative isolate">
+    <div className="home-page relative w-full">
       <HomeParallaxBg />
       <div className="relative z-[1]">
         <HomeHero kpis={HERO_KPIS} />
