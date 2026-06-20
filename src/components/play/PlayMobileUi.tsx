@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { ChevronLeft, ChevronRight, MapPin, X, ZoomIn } from "lucide-react";
 import { SiteCityscapeBg } from "@/components/site/SiteCityscapeBg";
 
 export function PlayMobileShell({
@@ -26,7 +26,64 @@ type PlayMediaFrameProps = {
   badgeRight?: string;
   variant?: "hero" | "banner" | "step" | "scene";
   className?: string;
+  zoomable?: boolean;
 };
+
+function PlayImageLightbox({
+  imageUrl,
+  label,
+  open,
+  onClose,
+}: {
+  imageUrl: string;
+  label: string;
+  open: boolean;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    if (!open) return;
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/92 p-4 touch-manipulation"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Zoomed view: ${label}`}
+      onClick={onClose}
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close zoomed image"
+        className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/50 text-white backdrop-blur-sm touch-manipulation"
+      >
+        <X className="h-5 w-5" />
+      </button>
+      <img
+        src={imageUrl}
+        alt={label}
+        className="max-h-[92dvh] max-w-full object-contain"
+        onClick={(event) => event.stopPropagation()}
+      />
+    </div>
+  );
+}
 
 /** Cinematic hunt imagery — consistent ratios, no crushed max-height caps. */
 export function PlayMediaFrame({
@@ -36,7 +93,9 @@ export function PlayMediaFrame({
   badgeRight,
   variant = "banner",
   className = "",
+  zoomable = true,
 }: PlayMediaFrameProps) {
+  const [zoomOpen, setZoomOpen] = useState(false);
   const ratio =
     variant === "scene"
       ? "aspect-[16/9] max-h-[132px]"
@@ -48,10 +107,8 @@ export function PlayMediaFrame({
 
   const isScene = variant === "scene";
 
-  return (
-    <div
-      className={`play-media-frame relative w-full overflow-hidden bg-ink/10 ${ratio} ${className}`}
-    >
+  const frame = (
+    <>
       <img
         src={imageUrl}
         alt=""
@@ -71,20 +128,26 @@ export function PlayMediaFrame({
       )}
       <div className="absolute inset-0 ring-1 ring-inset ring-white/15" />
 
+      {zoomable && (
+        <span className="pointer-events-none absolute bottom-2.5 right-2.5 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/35 bg-black/35 text-white/90 opacity-85 backdrop-blur-md">
+          <ZoomIn className="h-3.5 w-3.5" />
+        </span>
+      )}
+
       {isScene ? (
         <>
-          <span className="absolute left-2.5 top-2.5 inline-flex items-center rounded-full border border-white/35 bg-black/30 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-white backdrop-blur-md">
+          <span className="pointer-events-none absolute left-2.5 top-2.5 inline-flex items-center rounded-full border border-white/35 bg-black/30 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-white backdrop-blur-md">
             {label}
           </span>
           {badgeRight && (
-            <span className="absolute right-2.5 top-2.5 inline-flex items-center rounded-full border border-white/35 bg-primary/80 px-2 py-0.5 font-mono text-[9px] font-semibold tabular-nums text-white backdrop-blur-md">
+            <span className="pointer-events-none absolute right-2.5 top-2.5 inline-flex items-center rounded-full border border-white/35 bg-primary/80 px-2 py-0.5 font-mono text-[9px] font-semibold tabular-nums text-white backdrop-blur-md">
               {badgeRight}
             </span>
           )}
         </>
       ) : (
         <div
-          className={`absolute inset-x-0 bottom-0 flex flex-col items-center px-5 text-center ${
+          className={`pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center px-5 text-center ${
             variant === "step" ? "pb-4 pt-16" : "pb-5 pt-20"
           }`}
         >
@@ -102,7 +165,34 @@ export function PlayMediaFrame({
           )}
         </div>
       )}
-    </div>
+    </>
+  );
+
+  return (
+    <>
+      {zoomable ? (
+        <button
+          type="button"
+          onClick={() => setZoomOpen(true)}
+          aria-label={`View ${label} image full size`}
+          className={`play-media-frame group relative w-full overflow-hidden bg-ink/10 text-left touch-manipulation cursor-zoom-in active:opacity-95 ${ratio} ${className}`}
+        >
+          {frame}
+        </button>
+      ) : (
+        <div className={`play-media-frame relative w-full overflow-hidden bg-ink/10 ${ratio} ${className}`}>
+          {frame}
+        </div>
+      )}
+      {zoomable && (
+        <PlayImageLightbox
+          imageUrl={imageUrl}
+          label={label}
+          open={zoomOpen}
+          onClose={() => setZoomOpen(false)}
+        />
+      )}
+    </>
   );
 }
 
