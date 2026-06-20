@@ -111,9 +111,9 @@ export function Header() {
               }}
             >
               <img
-                src="/assets/branding/logo-main.svg"
+                src="/assets/branding/logo-main.png"
                 alt="Souvenir Hunt"
-                className="h-7 sm:h-9 w-auto shrink-0 object-contain [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(98%)_saturate(4688%)_hue-rotate(221deg)_brightness(101%)_contrast(103%)]"
+                className="h-7 sm:h-9 w-auto shrink-0 object-contain"
               />
               <span className="font-display font-bold text-[1.05rem] sm:text-[1.3rem] md:text-[1.45rem] leading-none text-primary tracking-tight whitespace-nowrap">
                 Souvenir Hunt

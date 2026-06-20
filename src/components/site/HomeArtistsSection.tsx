@@ -1,6 +1,6 @@
 import { Reveal } from "@/components/site/Reveal";
 
-const HOME_BG = "/assets/branding/background-static.svg";
+const HOME_BG = "/assets/branding/background-static.png";
 
 export function HomeArtistsSection() {
   return (

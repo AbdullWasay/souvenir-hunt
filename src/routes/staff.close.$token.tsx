@@ -39,10 +39,10 @@ function StaffClosePage() {
       <div className="mb-8 flex flex-col items-center gap-3 sm:mb-10">
         <div className="flex items-center gap-3">
           <img
-            src="/assets/branding/logo-main.svg"
+            src="/assets/branding/logo-main.png"
             alt=""
             aria-hidden
-            className="h-10 sm:h-12 w-auto shrink-0 object-contain [filter:brightness(0)_saturate(100%)_invert(22%)_sepia(98%)_saturate(4688%)_hue-rotate(221deg)_brightness(101%)_contrast(103%)]"
+            className="h-10 sm:h-12 w-auto shrink-0 object-contain"
           />
           <span className="font-display font-bold text-[1.35rem] sm:text-[1.65rem] leading-none text-primary tracking-tight">
             Souvenir Hunt

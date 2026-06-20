@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const CITYSCAPE_BG = "/assets/branding/background-static.svg";
+const CITYSCAPE_BG = "/assets/branding/background-static.png";
 
 /** Fixed cityscape background — stays still while page content scrolls. */
 export function SiteCityscapeBg() {
