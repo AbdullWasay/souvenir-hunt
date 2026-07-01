@@ -31,6 +31,7 @@ export function serializeHunt(doc: HuntDoc & { _id?: ObjectId }): SerializedHunt
     durationLabel: doc.durationLabel || "1.5–2 hrs",
     playersLabel: doc.playersLabel || "1–6 players",
     locationLabel: doc.locationLabel || "",
+    introText: doc.introText || "",
     published: doc.published ?? false,
     steps: normalizeSteps(Array.isArray(doc.steps) ? doc.steps : []),
     createdAt: doc.createdAt ?? now,

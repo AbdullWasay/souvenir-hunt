@@ -38,6 +38,7 @@ export function normalizeStep(raw: RawStepDoc, index: number): StepDoc {
   const answerList = [
     ...(raw.answer?.trim() ? [raw.answer.trim()] : []),
     ...(Array.isArray(raw.answers) ? raw.answers.map((a) => a.trim()).filter(Boolean) : []),
+    ...(Array.isArray(raw.acceptedAnswers) ? raw.acceptedAnswers.map((a) => a.trim()).filter(Boolean) : []),
   ];
   const acceptedAnswers = [...new Set(answerList.map((a) => a.toLowerCase()))];
 
@@ -63,6 +64,7 @@ export function normalizeStep(raw: RawStepDoc, index: number): StepDoc {
     answer: acceptedAnswers[0] ?? "",
     acceptedAnswers,
     location: raw.location,
+    imageUrl: raw.imageUrl,
     hints,
     story: raw.story ?? (storyParts.length ? storyParts.join("\n\n") : undefined),
     history: raw.history ?? (historyParts.length ? historyParts.join("\n\n") : undefined),

@@ -277,6 +277,7 @@ export async function getOrderByAccessTokenImpl(token: string) {
       city: hunt.city,
       heroImageUrl: hunt.heroImageUrl,
       locationLabel: hunt.locationLabel,
+      introText: hunt.introText,
       steps: normalizeSteps(hunt.steps),
     },
     progress: prog

@@ -12,6 +12,7 @@ export type StepDoc = {
   clue: string;
   answer: string;
   location?: string;
+  imageUrl?: string;
   hints: HintDoc[];
   story?: string;
   history?: string;
@@ -39,6 +40,8 @@ export type HuntDoc = {
   durationLabel: string;
   playersLabel: string;
   locationLabel: string;
+  /** Opening narration shown before the game starts. */
+  introText?: string;
   published: boolean;
   steps: StepDoc[];
   stepsContentVersion?: number;

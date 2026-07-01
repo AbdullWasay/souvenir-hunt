@@ -106,27 +106,22 @@ export function PlayMediaFrame({
           : "aspect-[16/11]";
 
   const isScene = variant === "scene";
+  const showFullImage = isScene || variant === "step" || variant === "hero";
+  const fullImageHeight = variant === "hero" ? "h-[168px]" : "h-[140px]";
 
-  const frame = (
+  const containerClass = showFullImage
+    ? `play-media-frame relative flex w-full items-center justify-center overflow-hidden bg-[#eef2f8] ${fullImageHeight}`
+    : `play-media-frame relative w-full overflow-hidden bg-ink/10 ${ratio}`;
+
+  const frame = showFullImage ? (
     <>
       <img
         src={imageUrl}
         alt=""
-        className="absolute inset-0 h-full w-full object-cover object-center"
+        className="h-full w-full object-contain object-center"
         loading="eager"
       />
-      {isScene ? (
-        <>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#061428]/55 via-transparent to-transparent" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_100%_0%,rgba(120,180,255,0.28),transparent_50%)]" />
-        </>
-      ) : (
-        <>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#061428]/90 via-[#0c2d5c]/35 to-[#1a4a8a]/10" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_0%,rgba(120,180,255,0.35),transparent_55%)]" />
-        </>
-      )}
-      <div className="absolute inset-0 ring-1 ring-inset ring-white/15" />
+      <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-black/8" />
 
       {zoomable && (
         <span className="pointer-events-none absolute bottom-2.5 right-2.5 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/35 bg-black/35 text-white/90 opacity-85 backdrop-blur-md">
@@ -136,11 +131,11 @@ export function PlayMediaFrame({
 
       {isScene ? (
         <>
-          <span className="pointer-events-none absolute left-2.5 top-2.5 inline-flex items-center rounded-full border border-white/35 bg-black/30 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-white backdrop-blur-md">
+          <span className="pointer-events-none absolute left-2.5 top-2.5 z-10 inline-flex items-center rounded-full border border-white/35 bg-black/30 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-white backdrop-blur-md">
             {label}
           </span>
           {badgeRight && (
-            <span className="pointer-events-none absolute right-2.5 top-2.5 inline-flex items-center rounded-full border border-white/35 bg-primary/80 px-2 py-0.5 font-mono text-[9px] font-semibold tabular-nums text-white backdrop-blur-md">
+            <span className="pointer-events-none absolute right-2.5 top-2.5 z-10 inline-flex items-center rounded-full border border-white/35 bg-primary/80 px-2 py-0.5 font-mono text-[9px] font-semibold tabular-nums text-white backdrop-blur-md">
               {badgeRight}
             </span>
           )}
@@ -148,15 +143,15 @@ export function PlayMediaFrame({
       ) : (
         <div
           className={`pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center px-5 text-center ${
-            variant === "step" ? "pb-4 pt-16" : "pb-5 pt-20"
+            variant === "hero" ? "pb-5 pt-20" : "pb-4 pt-16"
           }`}
         >
-          <span className="inline-flex items-center rounded-full border border-white/30 bg-white/15 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.22em] text-white/95 backdrop-blur-md">
+          <span className="inline-flex items-center rounded-full border border-white/30 bg-black/40 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.22em] text-white/95 backdrop-blur-md">
             {label}
           </span>
           {title && (
             <h2
-              className={`mt-2.5 font-display font-semibold leading-[1.08] tracking-[-0.02em] text-white text-balance ${
+              className={`mt-2.5 font-display font-semibold leading-[1.08] tracking-[-0.02em] text-white text-balance drop-shadow-sm ${
                 variant === "hero" ? "text-[1.5rem] sm:text-[1.65rem]" : "text-[1.2rem] sm:text-[1.35rem]"
               }`}
             >
@@ -165,6 +160,45 @@ export function PlayMediaFrame({
           )}
         </div>
       )}
+    </>
+  ) : (
+    <>
+      <img
+        src={imageUrl}
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover object-center"
+        loading="eager"
+      />
+      <>
+        <div className="absolute inset-0 bg-gradient-to-t from-[#061428]/90 via-[#0c2d5c]/35 to-[#1a4a8a]/10" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_0%,rgba(120,180,255,0.35),transparent_55%)]" />
+      </>
+      <div className="absolute inset-0 ring-1 ring-inset ring-white/15" />
+
+      {zoomable && (
+        <span className="pointer-events-none absolute bottom-2.5 right-2.5 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/35 bg-black/35 text-white/90 opacity-85 backdrop-blur-md">
+          <ZoomIn className="h-3.5 w-3.5" />
+        </span>
+      )}
+
+      <div
+        className={`pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center px-5 text-center ${
+          variant === "step" ? "pb-4 pt-16" : "pb-5 pt-20"
+        }`}
+      >
+        <span className="inline-flex items-center rounded-full border border-white/30 bg-white/15 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.22em] text-white/95 backdrop-blur-md">
+          {label}
+        </span>
+        {title && (
+          <h2
+            className={`mt-2.5 font-display font-semibold leading-[1.08] tracking-[-0.02em] text-white text-balance ${
+              variant === "hero" ? "text-[1.5rem] sm:text-[1.65rem]" : "text-[1.2rem] sm:text-[1.35rem]"
+            }`}
+          >
+            {title}
+          </h2>
+        )}
+      </div>
     </>
   );
 
@@ -175,14 +209,12 @@ export function PlayMediaFrame({
           type="button"
           onClick={() => setZoomOpen(true)}
           aria-label={`View ${label} image full size`}
-          className={`play-media-frame group relative w-full overflow-hidden bg-ink/10 text-left touch-manipulation cursor-zoom-in active:opacity-95 ${ratio} ${className}`}
+          className={`${containerClass} group text-left touch-manipulation cursor-zoom-in active:opacity-95 ${className}`}
         >
           {frame}
         </button>
       ) : (
-        <div className={`play-media-frame relative w-full overflow-hidden bg-ink/10 ${ratio} ${className}`}>
-          {frame}
-        </div>
+        <div className={`${containerClass} ${className}`}>{frame}</div>
       )}
       {zoomable && (
         <PlayImageLightbox

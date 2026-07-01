@@ -182,11 +182,18 @@ function PlayPage() {
 
   const tabParagraphs = stepFieldParagraphs(step, activeTab);
   const clueParts = stepFieldParagraphs(step, "clue");
-  const clueInstruction =
-    clueParts.find((p) => p.startsWith("Read the location carefully")) ?? clueParts[0] ?? "";
-  const clueQuestionParts = clueParts.filter((p) => p !== clueInstruction);
+  const boilerplate = clueParts.find((p) => p.startsWith("Read the location carefully"));
+  const clueInstruction = boilerplate ?? (clueParts.length > 1 ? clueParts[0] : "");
+  const clueQuestionParts = boilerplate
+    ? clueParts.filter((p) => p !== boilerplate)
+    : clueParts.length > 1
+      ? clueParts.slice(1)
+      : clueParts;
   const activeTabIndex = TAB_KEYS.indexOf(activeTab);
-  const stepImage = hunt.heroImageUrl || HUNT_IMAGE_FALLBACK;
+  const stepImage =
+    step?.imageUrl || hunt.heroImageUrl || HUNT_IMAGE_FALLBACK;
+  const startImage =
+    steps[0]?.imageUrl || hunt.heroImageUrl || HUNT_IMAGE_FALLBACK;
   const staffCloseUrl = data.staffCloseUrl;
 
   useEffect(() => {
@@ -370,11 +377,11 @@ function PlayPage() {
       <PlayMobileShell>
         <Reveal>
           <PlayStartCard
-            imageUrl={stepImage}
+            imageUrl={startImage}
             label="Before you start"
             title="Go to the start"
             hint="Walk to the starting point first. When you arrive, begin the run on location."
-            locationLabel={hunt.locationLabel}
+            locationLabel={hunt.locationLabel || "Statue of Grgur Ninski"}
             cityCountry={`${hunt.city}, ${hunt.country}`}
           >
             <PlayLinkBtn href={mapsUrl} target="_blank" rel="noreferrer">
@@ -394,10 +401,13 @@ function PlayPage() {
       <PlayMobileShell>
         <Reveal>
         <PlayIntroHero
-          imageUrl={stepImage}
+          imageUrl={startImage}
           label={`Game · ${gameId}`}
           title={hunt.name}
-          hint="Guide, story & clue on each stop."
+          hint={
+            hunt.introText ||
+            "Guide, story & clue on each stop."
+          }
         />
         </Reveal>
 
