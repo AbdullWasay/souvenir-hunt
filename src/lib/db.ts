@@ -40,7 +40,25 @@ function uid() {
 
 const SPLIT_HUNT_IMAGE_URL = "/assets/branding/split-hunt-image.svg";
 const EMPERORS_STEP_IMAGE = "/assets/hunts/emperors-secret";
-const EMPERORS_STEPS_VERSION = 12;
+const EMPERORS_STEPS_VERSION = 13;
+
+/** Filenames in steps-content-and-images / public/assets/hunts/emperors-secret */
+const EMPERORS_STEP_IMAGE_FILES = [
+  "Step 1 .png",
+  "Step 2 clue .png",
+  "Step 3.png",
+  "Step 4.png",
+  "Step 5.png",
+  "Step 6.png",
+  "Step 7.png",
+  "Step 8.png",
+] as const;
+
+function emperorsStepImageUrl(index: number): string {
+  const file = EMPERORS_STEP_IMAGE_FILES[index];
+  if (!file) throw new Error(`Missing step image for index ${index}`);
+  return `${EMPERORS_STEP_IMAGE}/${encodeURIComponent(file)}`;
+}
 
 const EMPERORS_INTRO_TEXT =
   "Listen carefully traveler, because this is the story long forgotten. Within these walls, something was hidden, not for the Empire, but for those who would dare to find. Follow the clues… and uncover Diocletian's secret.";
@@ -64,7 +82,7 @@ function emperorsSecretSteps(): StepDoc[] {
       id: uid(),
       title: "Bronze Giant",
       location: "Statue of Grgur Ninski",
-      imageUrl: `${EMPERORS_STEP_IMAGE}/step-1.png`,
+      imageUrl: emperorsStepImageUrl(0),
       guide: "Hunt starts next to the Grgur Ninski statue.",
       guideParts: ["Hunt starts next to the Grgur Ninski statue."],
       story:
@@ -82,7 +100,7 @@ function emperorsSecretSteps(): StepDoc[] {
       id: uid(),
       title: "Golden Gate",
       location: "Golden Gate",
-      imageUrl: `${EMPERORS_STEP_IMAGE}/step-2.png`,
+      imageUrl: emperorsStepImageUrl(1),
       guide: "Go down stairs to the gate, enter the palace. On the left side you will see text.",
       guideParts: ["Go down stairs to the gate, enter the palace. On the left side you will see text."],
       story:
@@ -101,7 +119,7 @@ function emperorsSecretSteps(): StepDoc[] {
       id: uid(),
       title: "Cardo Street",
       location: "Cardo Street",
-      imageUrl: `${EMPERORS_STEP_IMAGE}/step-3.png`,
+      imageUrl: emperorsStepImageUrl(2),
       guide: "Follow the street ahead till the end. Solve the clue to know which way to go next.",
       guideParts: ["Follow the street ahead till the end. Solve the clue to know which way to go next."],
       story:
@@ -121,7 +139,7 @@ function emperorsSecretSteps(): StepDoc[] {
       id: uid(),
       title: "Iron Gate",
       location: "Iron Gate",
-      imageUrl: `${EMPERORS_STEP_IMAGE}/step-4.png`,
+      imageUrl: emperorsStepImageUrl(3),
       guide:
         "At the end of Cardo street you can see main square called Peristyle but you are not going there you are turning right. Go to the western enter to the palace called The Iron Gate. Look up.",
       guideParts: [
@@ -147,7 +165,7 @@ function emperorsSecretSteps(): StepDoc[] {
       id: uid(),
       title: "Peristyle",
       location: "Peristyle",
-      imageUrl: `${EMPERORS_STEP_IMAGE}/step-5.png`,
+      imageUrl: emperorsStepImageUrl(4),
       guide:
         "Legend says statue of hands was built as a warning to those who enter palace from The Iron gates that they need to offer a gift to a guardian. Go back to the main square Peristyle.",
       guideParts: [
@@ -170,7 +188,7 @@ function emperorsSecretSteps(): StepDoc[] {
       id: uid(),
       title: "Cellars",
       location: "Palace cellars",
-      imageUrl: `${EMPERORS_STEP_IMAGE}/step-6.png`,
+      imageUrl: emperorsStepImageUrl(5),
       guide: "From Peristyle enter cellars and find a mozaic. First exit on left.",
       guideParts: ["From Peristyle enter cellars and find a mozaic. First exit on left."],
       story:
@@ -191,7 +209,7 @@ function emperorsSecretSteps(): StepDoc[] {
       id: uid(),
       title: "Riva",
       location: "Riva promenade",
-      imageUrl: `${EMPERORS_STEP_IMAGE}/step-7.png`,
+      imageUrl: emperorsStepImageUrl(6),
       guide:
         "Go back in the cellars and continue to the exit closer to the sea. You will find yourself on Riva promenade where 3D map is located. Find it and use it to find location of the secret.",
       guideParts: [
@@ -217,7 +235,7 @@ function emperorsSecretSteps(): StepDoc[] {
       id: uid(),
       title: "Old Town Market (Pazar)",
       location: "Pazar",
-      imageUrl: `${EMPERORS_STEP_IMAGE}/step-8.png`,
+      imageUrl: emperorsStepImageUrl(7),
       guide:
         "You discovered that secret is somewhere on the local market called \"Pazar\". Walk along the area of the market. Keep your eyes open.",
       guideParts: [
