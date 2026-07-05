@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, MapPin, X, ZoomIn } from "lucide-react";
 import { SiteCityscapeBg } from "@/components/site/SiteCityscapeBg";
 
@@ -57,29 +58,108 @@ function PlayImageLightbox({
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/92 p-4 touch-manipulation"
+      className="play-image-lightbox fixed inset-0 z-[500] flex flex-col bg-[#f0f5ff]/[0.98] touch-manipulation"
       role="dialog"
       aria-modal="true"
       aria-label={`Zoomed view: ${label}`}
-      onClick={onClose}
     >
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-primary/10 bg-white/80 px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur-md">
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">{label}</span>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close zoomed image"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border bg-white text-ink shadow-sm touch-manipulation"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+
       <button
         type="button"
         onClick={onClose}
         aria-label="Close zoomed image"
-        className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-black/50 text-white backdrop-blur-sm touch-manipulation"
+        className="flex min-h-0 flex-1 items-center justify-center bg-[#eef2f8] px-4 py-3 touch-manipulation"
       >
-        <X className="h-5 w-5" />
+        <img
+          src={imageUrl}
+          alt={label}
+          className="max-h-[min(78dvh,900px)] w-auto max-w-full object-contain shadow-paper"
+          onClick={(event) => event.stopPropagation()}
+        />
       </button>
-      <img
-        src={imageUrl}
-        alt={label}
-        className="max-h-[92dvh] max-w-full object-contain"
-        onClick={(event) => event.stopPropagation()}
+
+      <p className="shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))] text-center text-[11px] text-muted-foreground">
+        Tap to close
+      </p>
+    </div>,
+    document.body,
+  );
+}
+
+function PlayZoomableImage({
+  imageUrl,
+  label,
+  className = "",
+  imgClassName = "h-full w-full object-cover object-center",
+}: {
+  imageUrl: string;
+  label: string;
+  className?: string;
+  imgClassName?: string;
+}) {
+  const [zoomOpen, setZoomOpen] = useState(false);
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setZoomOpen(true)}
+        aria-label={`View ${label} image full size`}
+        className={`relative overflow-hidden touch-manipulation cursor-zoom-in active:opacity-95 ${className}`}
+      >
+        <img src={imageUrl} alt="" className={imgClassName} loading="eager" />
+        <span className="pointer-events-none absolute bottom-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-white/35 bg-black/35 text-white/90 backdrop-blur-md">
+          <ZoomIn className="h-3.5 w-3.5" />
+        </span>
+      </button>
+      <PlayImageLightbox
+        imageUrl={imageUrl}
+        label={label}
+        open={zoomOpen}
+        onClose={() => setZoomOpen(false)}
+      />
+    </>
+  );
+}
+
+function PlaySplitMediaHeader({
+  imageUrl,
+  imageLabel,
+  children,
+  className = "",
+}: {
+  imageUrl: string;
+  imageLabel: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`grid grid-cols-[minmax(0,1.35fr)_minmax(0,0.65fr)] gap-0 border-b border-border/60 ${className}`}
+    >
+      <div className="flex min-h-[220px] flex-col justify-between gap-3 bg-gradient-to-br from-primary via-[#1a52e0] to-[#0b3fd4] px-4 py-4 text-left text-white">
+        {children}
+      </div>
+      <PlayZoomableImage
+        imageUrl={imageUrl}
+        label={imageLabel}
+        className="relative h-full min-h-[220px] w-full overflow-hidden bg-[#dfe8f5]"
+        imgClassName="absolute inset-0 h-full w-full object-cover object-center"
       />
     </div>
   );
@@ -107,7 +187,8 @@ export function PlayMediaFrame({
 
   const isScene = variant === "scene";
   const showFullImage = isScene || variant === "step" || variant === "hero";
-  const fullImageHeight = variant === "hero" ? "h-[168px]" : "h-[140px]";
+  const fullImageHeight =
+    variant === "hero" ? "h-[min(52vw,200px)]" : variant === "scene" ? "h-[140px]" : "h-[140px]";
 
   const containerClass = showFullImage
     ? `play-media-frame relative flex w-full items-center justify-center overflow-hidden bg-[#eef2f8] ${fullImageHeight}`
@@ -141,24 +222,9 @@ export function PlayMediaFrame({
           )}
         </>
       ) : (
-        <div
-          className={`pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center px-5 text-center ${
-            variant === "hero" ? "pb-5 pt-20" : "pb-4 pt-16"
-          }`}
-        >
-          <span className="inline-flex items-center rounded-full border border-white/30 bg-black/40 px-3 py-1 font-mono text-[9px] uppercase tracking-[0.22em] text-white/95 backdrop-blur-md">
-            {label}
-          </span>
-          {title && (
-            <h2
-              className={`mt-2.5 font-display font-semibold leading-[1.08] tracking-[-0.02em] text-white text-balance drop-shadow-sm ${
-                variant === "hero" ? "text-[1.5rem] sm:text-[1.65rem]" : "text-[1.2rem] sm:text-[1.35rem]"
-              }`}
-            >
-              {title}
-            </h2>
-          )}
-        </div>
+        <span className="pointer-events-none absolute left-2.5 top-2.5 z-10 inline-flex items-center rounded-full border border-white/35 bg-black/30 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-white backdrop-blur-md">
+          {label}
+        </span>
       )}
     </>
   ) : (
@@ -248,12 +314,20 @@ export function PlayStartCard({
 }) {
   return (
     <article className="paper-card overflow-hidden rounded-[1.75rem] border border-border/80 shadow-paper">
-      <PlayMediaFrame imageUrl={imageUrl} label={label} title={title} variant="hero" />
+      <PlaySplitMediaHeader imageUrl={imageUrl} imageLabel={label}>
+        <div className="space-y-2.5">
+          <span className="inline-flex rounded-full border border-white/30 bg-white/12 px-2.5 py-1 font-mono text-[9px] font-medium uppercase tracking-[0.14em] text-white/95">
+            {label}
+          </span>
+          <h2 className="font-display text-[1.3rem] font-semibold leading-[1.08] tracking-[-0.02em] text-white">
+            {title}
+          </h2>
+          <p className="text-[0.84rem] leading-relaxed text-white/85 line-clamp-4">{hint}</p>
+        </div>
+      </PlaySplitMediaHeader>
 
       <div className="border-t border-border/60 bg-gradient-to-b from-white to-blue-50/50 px-5 py-5">
-        <p className="text-pretty text-center text-[0.88rem] leading-relaxed text-foreground/75">{hint}</p>
-
-        <div className="mt-5 rounded-2xl border border-primary/15 bg-white/95 px-4 py-4 shadow-sm">
+        <div className="rounded-2xl border border-primary/15 bg-white/95 px-4 py-4 shadow-sm">
           <p className="text-center font-mono text-[9px] uppercase tracking-[0.24em] text-primary">Start point</p>
           <div className="mt-2.5 flex items-start justify-center gap-2 text-center">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -282,12 +356,19 @@ export function PlayIntroHero({
 }) {
   return (
     <article className="paper-card overflow-hidden rounded-[1.75rem] border border-border/80 shadow-paper">
-      <PlayMediaFrame imageUrl={imageUrl} label={label} title={title} variant="hero" />
-      {hint && (
-        <p className="border-t border-border/50 bg-gradient-to-b from-white to-blue-50/40 px-5 py-4 text-center text-[0.88rem] leading-relaxed text-foreground/75">
-          {hint}
-        </p>
-      )}
+      <PlaySplitMediaHeader imageUrl={imageUrl} imageLabel={label}>
+        <div className="space-y-2.5">
+          <span className="inline-flex rounded-full border border-white/30 bg-white/12 px-2.5 py-1 font-mono text-[9px] font-medium uppercase tracking-[0.14em] text-white/95">
+            {label}
+          </span>
+          <h2 className="font-display text-[1.3rem] font-semibold leading-[1.08] tracking-[-0.02em] text-white">
+            {title}
+          </h2>
+          {hint && (
+            <p className="text-[0.84rem] leading-relaxed text-white/85 line-clamp-5">{hint}</p>
+          )}
+        </div>
+      </PlaySplitMediaHeader>
     </article>
   );
 }
@@ -656,26 +737,55 @@ export function PlayActiveSession({
 }: PlayActiveSessionProps) {
   return (
     <article className="paper-card overflow-hidden rounded-2xl border border-border/80 shadow-paper">
-      <PlayMediaFrame
-        imageUrl={heroImage}
-        label={heroLabel}
-        variant="scene"
-        className="rounded-none"
-      />
-      <PlayProgressBanner
-        embedded
-        gameId={gameId}
-        huntName={huntName}
-        stepTitle={stepTitle}
-        location={location}
-        progressPct={progressPct}
-        total={total}
-        current={current}
-        completedIds={completedIds}
-        stepIds={stepIds}
-        viewing={viewing}
-        onSelect={onSelect}
-      />
+      <PlaySplitMediaHeader imageUrl={heroImage} imageLabel={heroLabel}>
+        <div className="space-y-2.5">
+          <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/60">
+            {huntName}
+          </p>
+          <p className="-mt-1 font-mono text-[10px] font-medium tabular-nums tracking-wider text-white/45">
+            {gameId}
+          </p>
+          <h2 className="font-display text-[1.32rem] font-semibold leading-[1.08] tracking-[-0.02em] text-white line-clamp-2">
+            {stepTitle}
+          </h2>
+          {location && (
+            <p className="flex items-start gap-1.5 text-[11px] leading-snug text-white/80">
+              <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-white/70" />
+              <span>{location}</span>
+            </p>
+          )}
+          <span className="inline-flex rounded-full border border-white/30 bg-white/12 px-2.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-white">
+            {heroLabel}
+          </span>
+        </div>
+
+        <div className="space-y-2.5 border-t border-white/15 pt-3">
+          <p className="font-display text-[1rem] font-semibold leading-none tabular-nums text-white">
+            Stop {stepNumber}
+            <span className="text-[0.85rem] font-normal text-white/55"> / {stepTotal}</span>
+          </p>
+          <div className="flex items-center gap-2.5">
+            <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/20">
+              <div
+                className="h-full rounded-full bg-white transition-all duration-500"
+                style={{ width: `${Math.max(progressPct, 4)}%` }}
+              />
+            </div>
+            <span className="shrink-0 font-mono text-[10px] font-semibold tabular-nums text-white/90">
+              {progressPct}%
+            </span>
+          </div>
+          <PlayStepStrip
+            theme="light"
+            total={total}
+            current={current}
+            completedIds={completedIds}
+            stepIds={stepIds}
+            viewing={viewing}
+            onSelect={onSelect}
+          />
+        </div>
+      </PlaySplitMediaHeader>
       <div className="bg-gradient-to-b from-white to-blue-50/25 p-3">{children}</div>
     </article>
   );
