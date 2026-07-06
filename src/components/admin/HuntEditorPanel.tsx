@@ -33,7 +33,7 @@ function normalizeHunt(hunt: AdminHunt): AdminHunt {
     steps,
     priceCents: hunt.priceCents ?? 0,
     currency: hunt.currency || "eur",
-    durationLabel: hunt.durationLabel || "1.5–2 hrs",
+    durationLabel: hunt.durationLabel || "30–45 min",
     playersLabel: hunt.playersLabel || "1–6 players",
     locationLabel: hunt.locationLabel || "",
     description: hunt.description || "",

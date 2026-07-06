@@ -28,7 +28,7 @@ export function serializeHunt(doc: HuntDoc & { _id?: ObjectId }): SerializedHunt
     status: doc.status || "coming_soon",
     priceCents: doc.priceCents ?? 0,
     currency: doc.currency || "eur",
-    durationLabel: doc.durationLabel || "1.5–2 hrs",
+    durationLabel: doc.durationLabel || "30–45 min",
     playersLabel: doc.playersLabel || "1–6 players",
     locationLabel: doc.locationLabel || "",
     introText: doc.introText || "",

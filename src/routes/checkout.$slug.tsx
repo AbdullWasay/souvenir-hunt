@@ -50,7 +50,7 @@ function CheckoutPage() {
     }
   }
 
-  const price = hunt.priceCents ? (hunt.priceCents / 100).toFixed(0) : "39";
+  const price = hunt.priceCents ? (hunt.priceCents / 100).toFixed(0) : "25";
   const heroImage = hunt.heroImageUrl || HUNT_IMAGE_FALLBACK;
 
   return (
